@@ -9,7 +9,7 @@
 <style>
 :root{--gold:#D4AF37;--silver:#A8A9AD;--oil:#4A90D9;--sp:#2ECC71;--btc:#F7931A;--bg:#0A0C10;--bg2:#111318;--bg3:#181C24;--border:rgba(255,255,255,0.07);--text:#E8EAF0;--text2:#8890A4;--text3:#555E72;--green:#2ECC71;--red:#E74C3C;--radius:14px;--font:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;scrollbar-gutter:stable}
 .header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
 .header-left{display:flex;align-items:center;gap:12px}
 .logo{width:34px;height:34px;background:conic-gradient(var(--gold),var(--btc),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
@@ -126,13 +126,15 @@ tr.best-row td:first-child{border-left:2px solid var(--green);padding-left:14px}
   display:none;position:fixed;inset:0;z-index:999;
   background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
   align-items:center;justify-content:center;padding:20px;
+  overflow-y:auto;overscroll-behavior:contain;
 }
 .donate-overlay.open { display:flex; animation:fadeIn .25s ease; }
 @keyframes fadeIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
 .donate-modal {
   background:var(--bg2);border:1px solid rgba(168,85,247,.3);
-  border-radius:20px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;
+  border-radius:20px;max-width:720px;width:100%;
   box-shadow:0 0 80px rgba(168,85,247,.25);position:relative;
+  margin:auto;
 }
 .donate-close {
   position:absolute;top:14px;right:16px;background:var(--bg3);border:1px solid var(--border);
@@ -190,9 +192,131 @@ tr.best-row td:first-child{border-left:2px solid var(--green);padding-left:14px}
 .qr-wrap img { width:160px;height:160px;border-radius:12px;border:3px solid rgba(255,255,255,.08); }
 .qr-label { text-align:center;font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:8px; }
 
+
+/* ===== ANIMATED LOADER ===== */
+#appLoader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+#appLoader.hidden {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+.loader-logo-wrap {
+  position: relative; width: 96px; height: 96px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 28px;
+}
+.loader-ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: var(--gold);
+  border-right-color: rgba(212,175,55,0.3);
+  animation: loaderSpin 1.1s linear infinite;
+}
+.loader-ring-2 {
+  position: absolute; inset: 8px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-bottom-color: var(--btc);
+  border-left-color: rgba(247,147,26,0.2);
+  animation: loaderSpin 1.7s linear infinite reverse;
+}
+@keyframes loaderSpin { to { transform: rotate(360deg); } }
+.loader-icon {
+  font-size: 32px;
+  animation: loaderPulse 2s ease-in-out infinite;
+}
+@keyframes loaderPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(0.88);opacity:0.7} }
+.loader-title {
+  font-family: var(--font); font-size: 20px; font-weight: 700;
+  color: var(--text); letter-spacing: -0.4px; margin-bottom: 4px;
+}
+.loader-title span { color: var(--gold); }
+.loader-subtitle {
+  font-family: var(--mono); font-size: 11px; color: var(--text3);
+  letter-spacing: 0.5px; margin-bottom: 36px;
+}
+.loader-feeds {
+  display: flex; flex-direction: column; gap: 10px;
+  width: 260px;
+}
+.loader-feed-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.loader-feed-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--bg3); flex-shrink: 0;
+  transition: background 0.4s ease;
+}
+.loader-feed-dot.active  { background: var(--gold); animation: feedPulse 0.9s ease-in-out infinite; }
+.loader-feed-dot.done    { background: var(--green); animation: none; }
+.loader-feed-dot.error   { background: var(--red);   animation: none; }
+@keyframes feedPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.loader-feed-label {
+  font-family: var(--mono); font-size: 11px; color: var(--text2); flex: 1;
+}
+.loader-feed-status {
+  font-family: var(--mono); font-size: 10px; color: var(--text3);
+  min-width: 56px; text-align: right; transition: color 0.3s;
+}
+.loader-feed-row.row-done  .loader-feed-status { color: var(--green); }
+.loader-feed-row.row-error .loader-feed-status { color: var(--red); }
+.loader-bar-wrap {
+  margin-top: 28px; width: 260px; height: 2px;
+  background: var(--bg3); border-radius: 2px; overflow: hidden;
+}
+.loader-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--btc));
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
 </style>
 </head>
 <body>
+<!-- ===== ANIMATED LOADER ===== -->
+<div id="appLoader">
+  <div class="loader-logo-wrap">
+    <div class="loader-ring"></div>
+    <div class="loader-ring-2"></div>
+    <div class="loader-icon">📊</div>
+  </div>
+  <div class="loader-title">Global Market <span>Price Tracker</span></div>
+  <div class="loader-subtitle">FETCHING LIVE DATA</div>
+  <div class="loader-feeds">
+    <div class="loader-feed-row" id="lf-fx">
+      <div class="loader-feed-dot active" id="lfd-fx"></div>
+      <div class="loader-feed-label">FX Rates &amp; Currency</div>
+      <div class="loader-feed-status" id="lfs-fx">waiting…</div>
+    </div>
+    <div class="loader-feed-row" id="lf-metals">
+      <div class="loader-feed-dot" id="lfd-metals"></div>
+      <div class="loader-feed-label">Gold &amp; Silver Spot</div>
+      <div class="loader-feed-status" id="lfs-metals">waiting…</div>
+    </div>
+    <div class="loader-feed-row" id="lf-oil">
+      <div class="loader-feed-dot" id="lfd-oil"></div>
+      <div class="loader-feed-label">Crude Oil Prices</div>
+      <div class="loader-feed-status" id="lfs-oil">waiting…</div>
+    </div>
+    <div class="loader-feed-row" id="lf-indices">
+      <div class="loader-feed-dot" id="lfd-indices"></div>
+      <div class="loader-feed-label">World Indices</div>
+      <div class="loader-feed-status" id="lfs-indices">waiting…</div>
+    </div>
+    <div class="loader-feed-row" id="lf-crypto">
+      <div class="loader-feed-dot" id="lfd-crypto"></div>
+      <div class="loader-feed-label">Crypto Markets</div>
+      <div class="loader-feed-status" id="lfs-crypto">waiting…</div>
+    </div>
+  </div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"></div></div>
+</div>
+
 <div class="header">
   <div class="header-left">
     <div class="logo">📊</div>
@@ -635,11 +759,11 @@ const LIVE = {
   arbUSD:       0.7210,
   atomUSD:      6.420,
   // Oil USD/barrel
-  wtiUSD:       97.00,
-  brentUSD:     104.00,
-  dubaiUSD:     103.50,
-  uralsUSD:     102.50,
-  chinaUSD:     102.58,
+  wtiUSD:       61.50,
+  brentUSD:     64.00,
+  dubaiUSD:     62.00,
+  uralsUSD:     53.00,
+  chinaUSD:     63.00,
   // FX: 1 unit foreign = X INR
   fx: {
     USD: 95.56,
@@ -746,6 +870,32 @@ async function safeFetch(url, opts={}) {
   } catch(e) { return null; }
 }
 
+// CORS proxy fetch — always routes through a proxy on hosted/file:// environments.
+// On localhost only, tries direct first (faster). This prevents the browser from firing
+// a doomed cross-origin request that pollutes the console with CORS errors (including
+// the "origin 'null'" error that appears when opening via file://).
+async function safeProxiedFetch(url) {
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    const direct = await safeFetch(url);
+    if (direct !== null) return direct;
+  }
+  // Proxy 1: allorigins.win (wraps response in {contents: "..."})
+  try {
+    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, {signal: AbortSignal.timeout(10000)});
+    if (r.ok) {
+      const wrapper = await r.json();
+      if (wrapper?.contents) return JSON.parse(wrapper.contents);
+    }
+  } catch(e) {}
+  // Proxy 2: codetabs.com (returns raw proxied response — no JSON wrapper)
+  try {
+    const r2 = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, {signal: AbortSignal.timeout(10000)});
+    if (r2.ok) return await r2.json();
+  } catch(e) {}
+  return null;
+}
+
 async function fetchFX() {
   // ExchangeRate-API free endpoint (no key needed for base USD)
   const d = await safeFetch('https://open.er-api.com/v6/latest/USD');
@@ -793,55 +943,55 @@ async function fetchCrypto() {
 }
 
 async function fetchGoldSilver() {
-  // Metals-API free tier (metals.live public endpoint)
-  // Primary: metals.live (no key)
-  const d = await safeFetch('https://metals.live/api/spot');
-  if (d && Array.isArray(d)) {
-    const gold   = d.find(m=>m.metal==='XAU'||m.metal==='gold');
-    const silver = d.find(m=>m.metal==='XAG'||m.metal==='silver');
-    if (gold?.price)   LIVE.goldUSDoz   = gold.price;
-    if (silver?.price) LIVE.silverUSDoz = silver.price;
+  // All requests go through proxy — handles null origin (file://) and subdomain CORS blocks
+  // Primary: goldprice.org — reliable metals data, no API key
+  const d = await safeProxiedFetch('https://data-asg.goldprice.org/dbXRates/USD');
+  if (d?.items?.[0]) {
+    const item = d.items[0];
+    if (item.xauPrice) LIVE.goldUSDoz   = item.xauPrice;
+    if (item.xagPrice) LIVE.silverUSDoz = item.xagPrice;
     LIVE.apiStatus.metals = 'live';
     return;
   }
-  // Fallback: frankfurter for spot approximation via GBP spread
-  const d2 = await safeFetch('https://api.frankfurter.app/latest?from=USD&to=XAU,XAG');
-  if (d2?.rates) {
-    if (d2.rates.XAU) LIVE.goldUSDoz   = 1/d2.rates.XAU;
-    if (d2.rates.XAG) LIVE.silverUSDoz = 1/d2.rates.XAG;
-    LIVE.apiStatus.metals = 'live-frankfurter';
+  // Fallback: metals.live (no key)
+  const d2 = await safeProxiedFetch('https://metals.live/api/spot');
+  if (d2 && Array.isArray(d2)) {
+    const gold   = d2.find(m=>m.metal==='XAU'||m.metal==='gold');
+    const silver = d2.find(m=>m.metal==='XAG'||m.metal==='silver');
+    if (gold?.price)   LIVE.goldUSDoz   = gold.price;
+    if (silver?.price) LIVE.silverUSDoz = silver.price;
+    LIVE.apiStatus.metals = 'live';
     return;
   }
   LIVE.apiStatus.metals = 'fallback';
 }
 
 async function fetchOil() {
-  // EIA doesn't offer free live barrel prices without key.
-  // Use a public proxy that aggregates oil prices (oilpriceapi.com free tier)
-  // Fallback: use known values from user corrections
-  // Try: api.api-ninjas.com/v1/commodityprice — free with sign-up key
-  // Instead we'll use a public CORS endpoint for WTI from stooq-compatible source
-  const d = await safeFetch('https://api.oilpriceapi.com/v1/prices/latest', {
-    headers:{'Authorization':'Token DEMO'}
-  });
-  if (d?.data?.price) {
-    // OilPriceAPI returns WTI by default
-    LIVE.wtiUSD   = parseFloat(d.data.price);
-    LIVE.brentUSD = LIVE.wtiUSD + 7.0;   // typical spread
-    LIVE.dubaiUSD = LIVE.wtiUSD + 6.5;
-    LIVE.uralsUSD = LIVE.wtiUSD + 5.5;
-    LIVE.chinaUSD = LIVE.wtiUSD + 5.6;
+  // Primary: Stooq — free public market data, no key, routed via CORS proxy
+  // WTI (CL.F) and Brent (BZ.F) futures
+  const [wtiRaw, brentRaw] = await Promise.all([
+    safeProxiedFetch('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=json'),
+    safeProxiedFetch('https://stooq.com/q/l/?s=bz.f&f=sd2t2ohlcv&h&e=json')
+  ]);
+  const wtiClose   = parseFloat(wtiRaw?.symbols?.[0]?.close);
+  const brentClose = parseFloat(brentRaw?.symbols?.[0]?.close);
+  if (wtiClose > 0) {
+    LIVE.wtiUSD   = wtiClose;
+    LIVE.brentUSD = brentClose > 0 ? brentClose : wtiClose + 2.5;
+    LIVE.dubaiUSD = LIVE.wtiUSD + 0.5;   // Dubai/Oman trades near Brent
+    LIVE.uralsUSD = LIVE.brentUSD - 11;   // Urals ~$11 discount to Brent (sanctions)
+    LIVE.chinaUSD = LIVE.brentUSD - 1.0;  // SHFE crude tracks Brent closely
     LIVE.apiStatus.oil = 'live';
     return;
   }
-  // Try commodities via investing.com-like free API
-  const d2 = await safeFetch('https://query1.finance.yahoo.com/v8/finance/chart/CL=F?interval=1d&range=1d');
+  // Fallback: Yahoo Finance CL=F via CORS proxy
+  const d2 = await safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/CL=F?interval=1d&range=1d');
   if (d2?.chart?.result?.[0]?.meta?.regularMarketPrice) {
     LIVE.wtiUSD   = d2.chart.result[0].meta.regularMarketPrice;
-    LIVE.brentUSD = LIVE.wtiUSD + 7.0;
-    LIVE.dubaiUSD = LIVE.wtiUSD + 6.5;
-    LIVE.uralsUSD = LIVE.wtiUSD + 5.5;
-    LIVE.chinaUSD = LIVE.wtiUSD + 5.6;
+    LIVE.brentUSD = LIVE.wtiUSD + 2.5;
+    LIVE.dubaiUSD = LIVE.wtiUSD + 0.5;
+    LIVE.uralsUSD = LIVE.wtiUSD - 8.5;
+    LIVE.chinaUSD = LIVE.wtiUSD + 1.5;
     LIVE.apiStatus.oil = 'live-yahoo';
     return;
   }
@@ -849,35 +999,28 @@ async function fetchOil() {
 }
 
 async function fetchIndices() {
-  // Yahoo Finance public JSON endpoint — no auth needed
-  const tickers = ['%5EGSPC','%5ENSEI','%5EN225','%5EGDAXI','%5EFCHI','%5EFTSE','000001.SS','%5EHSI','%5EKSP11','%5ESTO50X','MOEX.ME','TA125.TA'];
-  const results = await Promise.allSettled(
-    tickers.map(t => safeFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${t}?interval=1d&range=1d`))
+  // Single bulk request via Yahoo Finance v7 quote API — all 15 indices in ONE call.
+  // This replaces 15 separate chart requests, eliminating the 429 rate-limit on CORS proxies.
+  const symbols = [
+    '%5EGSPC','%5ENSEI','%5EN225','%5EGDAXI','%5EFCHI','%5EFTSE',
+    '000001.SS','%5EHSI','%5EKS11','%5ESTOXX50E','MOEX.ME','TA125.TA',
+    '000300.SS','%5ESTI','%5ETWII'
+  ].join(',');
+  const bulk = await safeProxiedFetch(
+    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,symbol`
   );
-  const map = {0:'sp500',1:'nifty50',2:'nikkei',3:'dax',4:'cac40',5:'ftse100',6:'sse',7:'hangseng',8:'kospi',9:'euroStoxx',10:'moex',11:'ta125'};
+  const symMap = {
+    '^GSPC':'sp500','^NSEI':'nifty50','^N225':'nikkei','^GDAXI':'dax',
+    '^FCHI':'cac40','^FTSE':'ftse100','000001.SS':'sse','^HSI':'hangseng',
+    '^KS11':'kospi','^STOXX50E':'euroStoxx','MOEX.ME':'moex','TA125.TA':'ta125',
+    '000300.SS':'csi300','^STI':'sti','^TWII':'taiex'
+  };
   let anyLive = false;
-  results.forEach((r,i)=>{
-    if (r.status==='fulfilled'&&r.value?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-      const key = map[i];
-      if (key) { LIVE[key] = r.value.chart.result[0].meta.regularMarketPrice; anyLive=true; }
-    }
+  const qResults = bulk?.quoteResponse?.result || [];
+  qResults.forEach(q => {
+    const key = symMap[q.symbol];
+    if (key && q.regularMarketPrice) { LIVE[key] = q.regularMarketPrice; anyLive = true; }
   });
-  // CSI300 separate
-  const csi = await safeFetch('https://query1.finance.yahoo.com/v8/finance/chart/000300.SS?interval=1d&range=1d');
-  if (csi?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-    LIVE.csi300 = csi.chart.result[0].meta.regularMarketPrice; anyLive=true;
-  }
-  // STI (Straits Times Index)
-  const sti = await safeFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5ESTI?interval=1d&range=1d');
-  if (sti?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-    LIVE.sti = sti.chart.result[0].meta.regularMarketPrice; anyLive=true;
-  }
-  // TAIEX (Taiwan)
-  const taiex = await safeFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5ETWII?interval=1d&range=1d');
-  if (taiex?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-    LIVE.taiex = taiex.chart.result[0].meta.regularMarketPrice; anyLive=true;
-  }
-  // S&P Pan Arab — no free Yahoo ticker; use fallback seeded value
   LIVE.apiStatus.indices = anyLive ? 'live' : 'fallback';
 }
 
@@ -913,8 +1056,69 @@ function deriveIndiaPrices() {
 }
 
 // Master fetch
+// ============================================================
+// LOADER HELPERS
+// ============================================================
+let loaderDone = false;
+function loaderSetActive(id) {
+  const dot = document.getElementById('lfd-'+id);
+  const status = document.getElementById('lfs-'+id);
+  if (!dot || !status) return;
+  dot.classList.add('active');
+  status.textContent = 'fetching…';
+  status.style.color = '';
+}
+function loaderSetDone(id, live) {
+  const row  = document.getElementById('lf-'+id);
+  const dot  = document.getElementById('lfd-'+id);
+  const status = document.getElementById('lfs-'+id);
+  if (!dot || !status) return;
+  dot.classList.remove('active');
+  dot.classList.add(live ? 'done' : 'error');
+  if (row) row.classList.add(live ? 'row-done' : 'row-error');
+  status.textContent = live ? '✓ live' : '● fallback';
+}
+function loaderProgress(pct) {
+  const bar = document.getElementById('loaderBar');
+  if (bar) bar.style.width = pct + '%';
+}
+function dismissLoader() {
+  if (loaderDone) return;
+  loaderDone = true;
+  loaderProgress(100);
+  setTimeout(() => {
+    const el = document.getElementById('appLoader');
+    if (el) el.classList.add('hidden');
+  }, 420);
+}
+
 async function fetchAllAPIData() {
-  await Promise.allSettled([fetchFX(), fetchCrypto(), fetchGoldSilver(), fetchOil(), fetchIndices()]);
+  // Animate each feed row as it starts and resolves
+  loaderSetActive('fx');
+  loaderSetActive('metals');
+  loaderSetActive('oil');
+  loaderSetActive('indices');
+  loaderSetActive('crypto');
+  loaderProgress(8);
+
+  const t0 = Date.now();
+  const wrap = async (fn, id) => {
+    const result = await fn();
+    const live = LIVE.apiStatus[id] === 'live' || LIVE.apiStatus[id] === 'live-yahoo' || LIVE.apiStatus[id] === 'live-frankfurter';
+    loaderSetDone(id, live);
+    return result;
+  };
+
+  let done = 0;
+  const tick = () => { done++; loaderProgress(Math.min(8 + done * 18, 95)); };
+
+  await Promise.allSettled([
+    wrap(fetchFX,       'fx'     ).then(tick),
+    wrap(fetchGoldSilver,'metals').then(tick),
+    wrap(fetchOil,      'oil'    ).then(tick),
+    wrap(fetchIndices,  'indices').then(tick),
+    wrap(fetchCrypto,   'crypto' ).then(tick),
+  ]);
   deriveIndiaPrices();
 }
 
@@ -1484,6 +1688,7 @@ async function fetchAllData() {
   await fetchAllAPIData();
 
   renderAll();
+  dismissLoader();   // hide splash screen after first successful render
   const T=TRANSLATIONS[currentLang]||TRANSLATIONS.en;
   const statusParts = Object.entries(LIVE.apiStatus).map(([k,v])=>`${k}:${v==='live'||v==='live-yahoo'||v==='live-frankfurter'?'<span style="color:#2ECC71">✓</span>':'<span style="color:#E74C3C">'+(T.statusFallback||'fallback')+'</span>'}`).join(' · ');
   document.getElementById('lastUpdate').innerHTML=(T.statusUpdated||T.updated||'Updated')+' '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' · '+statusParts;
@@ -1552,8 +1757,8 @@ fetchAllData();
   </div>
 </div>
 <script>
-function openDonate(){ document.getElementById('donateOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeDonate(){ document.getElementById('donateOverlay').classList.remove('open'); document.body.style.overflow=''; }
+function openDonate(){ document.getElementById('donateOverlay').classList.add('open'); }
+function closeDonate(){ document.getElementById('donateOverlay').classList.remove('open'); }
 function closeDonateOutside(e){ if(e.target===document.getElementById('donateOverlay')) closeDonate(); }
 function copyAddr(id,btnId){
   const txt=document.getElementById(id).textContent.trim();
