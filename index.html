@@ -2183,20 +2183,23 @@ function renderGold() {
   const metalsTag = liveTag(isMetalsMarketOpen());
   const nseOpen = isExchangeOpen('nifty50'); // NSE ETF hours — time-based only
   document.getElementById('goldCards').innerHTML = [
-    {src:t('cardLbma')||'LBMA Spot',       lbl:t('goldCard24k')||'24K Gold / gram', price:spotPG,  basisLine:`${fmtUSD(spotUSDg,2)}/g`,  acc:'#D4AF37', sub:(t('goldCardIntlSpot')||'International spot'), tag:metalsTag, chg:goldChgLbma},
-    {src:t('cardMcx')||'MCX India',         lbl:t('goldCard24k')||'24K Gold / gram', price:mcxPG,   basisLine:`₹${mcxINRg.toFixed(2)}/g`, acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian market', tag:metalsTag, chg:goldChgMcx},
-    {src:t('cardGray')||'Gray Market',       lbl:t('goldCard24k')||'24K Gold / gram', price:grayPG,  basisLine:`₹${grayINRg.toFixed(2)}/g`,acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no GST invoice', tag:metalsTag, chg:goldChgGray},
-    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('goldCardDefi')||'Tokenized Gold/g PAXG',price:defiPG,basisLine:`${fmtUSD(defiUSDg,2)}/g`,acc:'#F7931A',sub:t('goldCardOracle')||'PAXG · XAUT oracle', tag:metalsTag, chg:goldChgDefi},
-    {src:t('cardGoldBees')||'GoldBEES NSE',  lbl:t('goldCardEtf')||'Per gram via ETF',price:beesPG,  basisLine:`₹${beesPerGramINR.toFixed(2)}/g (unit ₹${beesUnitINR.toFixed(2)})`,acc:'#9370DB',sub:'1 unit = 0.01g gold (NSE ETF)', tag:liveTag(nseOpen), chg:goldChgBees},
-    {src:t('cardChinaSge')||'China SGE',      lbl:t('goldCard24k')||'24K Gold / gram',  price:chinaGoldPG, basisLine:`${fmtUSD(chinaGoldUSDg,2)}/g`, acc:'#de2910', sub:t('goldCardChinaSge')||'SGE Shanghai Gold Exchange', tag:metalsTag, chg:goldChgChina},
-  ].map(c=>`<div class="price-card" style="--accent:${c.acc}">
+    {src:t('cardLbma')||'LBMA Spot',       lbl:t('goldCard24k')||'24K Gold / gram', price:spotPG,  basisLine:`${fmtUSD(spotUSDg,2)}/g`,  acc:'#D4AF37', sub:(t('goldCardIntlSpot')||'International spot'), tag:metalsTag, chg:goldChgLbma, flag:'us'},
+    {src:t('cardMcx')||'MCX India',         lbl:t('goldCard24k')||'24K Gold / gram', price:mcxPG,   basisLine:`₹${mcxINRg.toFixed(2)}/g`, acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian market', tag:metalsTag, chg:goldChgMcx, flag:'in'},
+    {src:t('cardGray')||'Gray Market',       lbl:t('goldCard24k')||'24K Gold / gram', price:grayPG,  basisLine:`₹${grayINRg.toFixed(2)}/g`,acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no GST invoice', tag:metalsTag, chg:goldChgGray, flag:'un'},
+    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('goldCardDefi')||'Tokenized Gold/g PAXG',price:defiPG,basisLine:`${fmtUSD(defiUSDg,2)}/g`,acc:'#F7931A',sub:t('goldCardOracle')||'PAXG · XAUT oracle', tag:metalsTag, chg:goldChgDefi, icon:'<img src="https://assets.coincap.io/assets/icons/paxg@2x.png" width="16" height="16" onerror="this.style.display=\'none\'" style="vertical-align:middle;margin-left:5px;">'},
+    {src:t('cardGoldBees')||'GoldBEES NSE',  lbl:t('goldCardEtf')||'Per gram via ETF',price:beesPG,  basisLine:`₹${beesPerGramINR.toFixed(2)}/g (unit ₹${beesUnitINR.toFixed(2)})`,acc:'#9370DB',sub:'1 unit = 0.01g gold (NSE ETF)', tag:liveTag(nseOpen), chg:goldChgBees, flag:'in'},
+    {src:t('cardChinaSge')||'China SGE',      lbl:t('goldCard24k')||'24K Gold / gram',  price:chinaGoldPG, basisLine:`${fmtUSD(chinaGoldUSDg,2)}/g`, acc:'#de2910', sub:t('goldCardChinaSge')||'SGE Shanghai Gold Exchange', tag:metalsTag, chg:goldChgChina, flag:'cn'},
+  ].map(c=>{
+    const fHtml = c.flag ? `<img src="https://flagcdn.com/w20/${c.flag}.png" srcset="https://flagcdn.com/w40/${c.flag}.png 2x" width="16" alt="${c.flag}" style="vertical-align:middle;margin-left:5px;border-radius:2px;box-shadow:0 0 2px rgba(0,0,0,0.3)">` : (c.icon ? c.icon : '');
+    return `<div class="price-card" style="--accent:${c.acc}">
     <div class="card-source">${c.src} ${c.tag}</div>
-    <div class="card-label">${c.lbl}</div>
+    <div class="card-label">${c.lbl}${fHtml}</div>
     <div class="card-price" style="color:${c.acc}">${fmt(c.price,2)}</div>
     <div class="card-sub">${c.basisLine}</div>
     ${chgBadge(c.chg)}
     <div style="font-size:9px;color:var(--text3);margin-top:3px">${c.sub}</div>
-  </div>`).join('');
+  </div>`;
+  }).join('');
 
   const fxLabel = selectedCurrency;
   const rows = [
@@ -2285,20 +2288,23 @@ function renderSilver() {
   const silverMetalsTag = liveTag(isMetalsMarketOpen()); // purely time-based
   const silverNseOpen = isExchangeOpen('nifty50');        // purely time-based
   document.getElementById('silverCards').innerHTML = [
-    {src:t('cardLbma')||'LBMA Spot',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:spotPG, basisLine:`${fmtUSD(spotUSDg,4)}/g`,   acc:'#A8A9AD', sub:(t('goldCardIntlSpot')||'International spot'), tag:silverMetalsTag, chg:silverChgLbma},
-    {src:t('cardMcx')||'MCX India',         lbl:t('silverCardFine')||'Fine Silver / gram',  price:mcxPG,  basisLine:`₹${mcxINRg.toFixed(2)}/g`,  acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian mkt', tag:silverMetalsTag, chg:silverChgMcx},
-    {src:t('cardGray')||'Gray Market',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:grayPG, basisLine:`₹${grayINRg.toFixed(2)}/g`, acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no invoice', tag:silverMetalsTag, chg:silverChgGray},
-    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('silverCardDefi')||'Tokenized Silver/g $PSLV',price:defiPG,basisLine:`${fmtUSD(defiUSDg,4)}/g`,acc:'#F7931A',sub:t('silverCardOracle')||'PSLV · LODE oracle', tag:silverMetalsTag, chg:silverChgDefi},
-    {src:t('cardSilverBees')||'SilverBEES NSE',lbl:t('goldCardEtf')||'Per gram via ETF',  price:beesPG, basisLine:`₹${beesINRg.toFixed(2)}/unit=1g`,acc:'#9370DB',sub:t('silverCardUnit')||'1 unit = 1g silver', tag:liveTag(silverNseOpen), chg:silverChgBees},
-    {src:t('cardChinaSge')||'China SGE',       lbl:t('silverCardFine')||'Fine Silver / gram', price:chinaSilverPG, basisLine:`${fmtUSD(chinaSilverUSDg,4)}/g`, acc:'#de2910', sub:t('silverCardChinaSge')||'SGE Shanghai Silver Exchange', tag:silverMetalsTag, chg:silverChgChina},
-  ].map(c=>`<div class="price-card" style="--accent:${c.acc}">
+    {src:t('cardLbma')||'LBMA Spot',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:spotPG, basisLine:`${fmtUSD(spotUSDg,4)}/g`,   acc:'#A8A9AD', sub:(t('goldCardIntlSpot')||'International spot'), tag:silverMetalsTag, chg:silverChgLbma, flag:'us'},
+    {src:t('cardMcx')||'MCX India',         lbl:t('silverCardFine')||'Fine Silver / gram',  price:mcxPG,  basisLine:`₹${mcxINRg.toFixed(2)}/g`,  acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian mkt', tag:silverMetalsTag, chg:silverChgMcx, flag:'in'},
+    {src:t('cardGray')||'Gray Market',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:grayPG, basisLine:`₹${grayINRg.toFixed(2)}/g`, acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no invoice', tag:silverMetalsTag, chg:silverChgGray, flag:'un'},
+    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('silverCardDefi')||'Tokenized Silver/g $PSLV',price:defiPG,basisLine:`${fmtUSD(defiUSDg,4)}/g`,acc:'#F7931A',sub:t('silverCardOracle')||'PSLV · LODE oracle', tag:silverMetalsTag, chg:silverChgDefi, icon:'<svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-left:5px;" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/><text x="12" y="16" font-family="sans-serif" font-weight="bold" font-size="11" fill="#475569" text-anchor="middle">Ag</text></svg>'},
+    {src:t('cardSilverBees')||'SilverBEES NSE',lbl:t('goldCardEtf')||'Per gram via ETF',  price:beesPG, basisLine:`₹${beesINRg.toFixed(2)}/unit=1g`,acc:'#9370DB',sub:t('silverCardUnit')||'1 unit = 1g silver', tag:liveTag(silverNseOpen), chg:silverChgBees, flag:'in'},
+    {src:t('cardChinaSge')||'China SGE',       lbl:t('silverCardFine')||'Fine Silver / gram', price:chinaSilverPG, basisLine:`${fmtUSD(chinaSilverUSDg,4)}/g`, acc:'#de2910', sub:t('silverCardChinaSge')||'SGE Shanghai Silver Exchange', tag:silverMetalsTag, chg:silverChgChina, flag:'cn'},
+  ].map(c=>{
+    const fHtml = c.flag ? `<img src="https://flagcdn.com/w20/${c.flag}.png" srcset="https://flagcdn.com/w40/${c.flag}.png 2x" width="16" alt="${c.flag}" style="vertical-align:middle;margin-left:5px;border-radius:2px;box-shadow:0 0 2px rgba(0,0,0,0.3)">` : (c.icon ? c.icon : '');
+    return `<div class="price-card" style="--accent:${c.acc}">
     <div class="card-source">${c.src} ${c.tag}</div>
-    <div class="card-label">${c.lbl}</div>
+    <div class="card-label">${c.lbl}${fHtml}</div>
     <div class="card-price" style="color:${c.acc}">${fmt(c.price,4)}</div>
     <div class="card-sub">${c.basisLine}</div>
     ${chgBadge(c.chg)}
     <div style="font-size:9px;color:var(--text3);margin-top:3px">${c.sub}</div>
-  </div>`).join('');
+  </div>`;
+  }).join('');
 
   const fxLabel = selectedCurrency;
   const rows = [
@@ -2375,20 +2381,23 @@ function renderOil() {
   const oilTag = liveTag(isOilMarketOpen()); // purely time-based — independent of API status
 
   document.getElementById('oilCards').innerHTML = [
-    {src:t('oilCardWti')||'WTI Crude',        lbl:t('oilLblUs')||'Per barrel (US)',    price:wtiConv,   raw:`${fmtUSD(wtiUSD)}/bbl`,    acc:'#4A90D9', sub:(t('oilSubNymex')||'NYMEX benchmark'),   chg:wtiChg},
-    {src:t('oilCardBrent')||'Brent Crude',      lbl:t('oilLblIntl')||'Per barrel (Intl)',  price:brentConv, raw:`${fmtUSD(brentUSD)}/bbl`,  acc:'#2980B9', sub:t('oilSubIce')||'ICE London benchmark',   chg:brentChg},
-    {src:t('oilCardDubai')||'Dubai Fateh/Oman', lbl:t('oilLblMe')||'Per barrel (ME)',    price:dubaiConv, raw:`${fmtUSD(dubaiUSD)}/bbl`,  acc:'#E67E22', sub:t('oilSubMe')||'Middle East benchmark',     chg:dubaiChg},
-    {src:t('oilCardUrals')||'Urals (Russia)',   lbl:t('oilLblBarrel')||'Per barrel',         price:uralsConv, raw:`${fmtUSD(uralsUSD)}/bbl`,  acc:'#d52b1e', sub:t('oilSubUrals')||'Russian export grade', chg:uralsChg},
-    {src:t('oilCardChina')||'China Crude',      lbl:t('oilLblShanghai')||'Shanghai spot',      price:chinaConv, raw:`${fmtUSD(chinaUSD)}/bbl`,  acc:'#de2910', sub:t('oilSubShfe')||'SHFE crude spot',      chg:chinaChg},
-    {src:t('oilCardGray')||'Gray Market',      lbl:t('oilLblOtc')||'OTC crude equiv.',   price:grayConv,  raw:`${fmtUSD(grayUSD)}/bbl`,   acc:'#8890A4', sub:t('oilSubGray')||'~1.5% above WTI OTC',   chg:grayChg},
-  ].map(c=>`<div class="price-card" style="--accent:${c.acc}">
+    {src:t('oilCardWti')||'WTI Crude',        lbl:t('oilLblUs')||'Per barrel (US)',    price:wtiConv,   raw:`${fmtUSD(wtiUSD)}/bbl`,    acc:'#4A90D9', sub:(t('oilSubNymex')||'NYMEX benchmark'),   chg:wtiChg, flag:'us'},
+    {src:t('oilCardBrent')||'Brent Crude',      lbl:t('oilLblIntl')||'Per barrel (Intl)',  price:brentConv, raw:`${fmtUSD(brentUSD)}/bbl`,  acc:'#2980B9', sub:t('oilSubIce')||'ICE London benchmark',   chg:brentChg, flag:'gb'},
+    {src:t('oilCardDubai')||'Dubai Fateh/Oman', lbl:t('oilLblMe')||'Per barrel (ME)',    price:dubaiConv, raw:`${fmtUSD(dubaiUSD)}/bbl`,  acc:'#E67E22', sub:t('oilSubMe')||'Middle East benchmark',     chg:dubaiChg, flag:'ae'},
+    {src:t('oilCardUrals')||'Urals (Russia)',   lbl:t('oilLblBarrel')||'Per barrel',         price:uralsConv, raw:`${fmtUSD(uralsUSD)}/bbl`,  acc:'#d52b1e', sub:t('oilSubUrals')||'Russian export grade', chg:uralsChg, flag:'ru'},
+    {src:t('oilCardChina')||'China Crude',      lbl:t('oilLblShanghai')||'Shanghai spot',      price:chinaConv, raw:`${fmtUSD(chinaUSD)}/bbl`,  acc:'#de2910', sub:t('oilSubShfe')||'SHFE crude spot',      chg:chinaChg, flag:'cn'},
+    {src:t('oilCardGray')||'Gray Market',      lbl:t('oilLblOtc')||'OTC crude equiv.',   price:grayConv,  raw:`${fmtUSD(grayUSD)}/bbl`,   acc:'#8890A4', sub:t('oilSubGray')||'~1.5% above WTI OTC',   chg:grayChg, flag:'un'},
+  ].map(c=>{
+    const fHtml = c.flag ? `<img src="https://flagcdn.com/w20/${c.flag}.png" srcset="https://flagcdn.com/w40/${c.flag}.png 2x" width="16" alt="${c.flag}" style="vertical-align:middle;margin-left:5px;border-radius:2px;box-shadow:0 0 2px rgba(0,0,0,0.3)">` : '';
+    return `<div class="price-card" style="--accent:${c.acc}">
     <div class="card-source">${c.src} ${oilTag}</div>
-    <div class="card-label">${c.lbl}</div>
+    <div class="card-label">${c.lbl}${fHtml}</div>
     <div class="card-price" style="color:${c.acc}">${fmt(c.price,2)}</div>
     <div class="card-sub">${c.raw}</div>
     ${chgBadge(c.chg)}
     <div style="font-size:9px;color:var(--text3);margin-top:3px">${c.sub}</div>
-  </div>`).join('');
+  </div>`;
+  }).join('');
 
   const oilRows = [
     {src:t('oilTblWti')||'WTI (NYMEX)',           badge:'badge-world',  grade:t('oilGradeWti')||'WTI Light Sweet',    priceConv:wtiConv,   usd:wtiUSD,   diff:null, ref:t('oilRef')||'Reference'},
@@ -2544,8 +2553,10 @@ function renderCrypto() {
     const dec = spotConv<1?6:spotConv<10?4:2;
     const mcapUSD = LIVE[c.key+'_mcap'] || (c.mcapB * 1e9);
     const vol24USD = LIVE[c.key+'_vol'] || (c.vol24B * 1e9);
+    const logoUrl = c.sym === 'FLOW' ? 'https://cryptologos.cc/logos/flow-flow-logo.svg' : `https://assets.coincap.io/assets/icons/${c.sym.toLowerCase()}@2x.png`;
+    const cLogo = `<img src="${logoUrl}" width="16" height="16" style="vertical-align:text-bottom;margin-right:5px;" onerror="this.style.display=\'none\'">`;
     return `<div class="price-card" style="--accent:${c.color}">
-      <div class="card-source">${c.sym} ${cryptoLiveTag}</div>
+      <div class="card-source">${cLogo}${c.sym} ${cryptoLiveTag}</div>
       <div class="card-label">${c.name}</div>
       <div class="card-price" style="color:${c.color}">${fmt(spotConv,dec)}</div>
       <div class="card-sub">${fmtUSD(spotUSD, spotUSD<0.01?6:spotUSD<1?4:2)} USDT</div>
@@ -2566,8 +2577,10 @@ function renderCrypto() {
     const ratio = vol24USD && mcapUSD ? ((vol24USD/mcapUSD)*100).toFixed(3)+'%' : '--';
     const ratioNum = vol24USD && mcapUSD ? (vol24USD/mcapUSD)*100 : 0;
     const ratioClass = ratioNum > 10 ? 'diff-pos' : ratioNum > 2 ? 'diff-neutral' : 'diff-neg';
+    const logoUrl = c.sym === 'FLOW' ? 'https://cryptologos.cc/logos/flow-flow-logo.svg' : `https://assets.coincap.io/assets/icons/${c.sym.toLowerCase()}@2x.png`;
+    const cLogo = `<img src="${logoUrl}" width="14" height="14" style="vertical-align:middle;margin-right:6px;" onerror="this.style.display=\'none\'">`;
     return `<tr>
-      <td class="source-name"><span style="color:${c.color};font-weight:700">${c.sym}</span> ${c.name}</td>
+      <td class="source-name">${cLogo}<span style="color:${c.color};font-weight:700">${c.sym}</span> ${c.name}</td>
       <td>${fmt(spotConv,dec)}</td>
       <td>${fmt(grayConv,dec)}</td>
       <td>${fmt(oracleConv,dec)}</td>
