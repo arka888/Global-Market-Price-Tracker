@@ -209,27 +209,56 @@
 <!-- ═══════════════════════════════════════════════════════
      PERFORMANCE & INDEXING HINTS
 ════════════════════════════════════════════════════════ -->
+<!-- Resource hints for all external APIs -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="dns-prefetch" href="https://open.er-api.com">
 <link rel="dns-prefetch" href="https://api.coingecko.com">
+<link rel="dns-prefetch" href="https://api.coincap.io">
+<link rel="dns-prefetch" href="https://api.binance.com">
+<link rel="dns-prefetch" href="https://query1.finance.yahoo.com">
+<link rel="dns-prefetch" href="https://stooq.com">
+<link rel="dns-prefetch" href="https://corsproxy.io">
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23F7931A'/%3E%3Cstop offset='100%25' stop-color='%23D4AF37'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='url(%23bg)'/%3E%3Crect x='5' y='19' width='4' height='8' rx='1' fill='%23fff' opacity='.95'/%3E%3Crect x='11' y='13' width='4' height='14' rx='1' fill='%23fff' opacity='.95'/%3E%3Crect x='17' y='8' width='4' height='19' rx='1' fill='%23fff' opacity='.95'/%3E%3Crect x='23' y='15' width='4' height='12' rx='1' fill='%23fff' opacity='.95'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- Non-blocking Google Fonts: load async via preload trick -->
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<!-- Chart.js loaded async — does NOT block page render -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" async defer></script>
 <style>
-:root{--gold:#D4AF37;--silver:#A8A9AD;--oil:#4A90D9;--sp:#2ECC71;--btc:#F7931A;--bg:#0A0C10;--bg2:#111318;--bg3:#181C24;--border:rgba(255,255,255,0.07);--text:#E8EAF0;--text2:#8890A4;--text3:#555E72;--green:#2ECC71;--red:#E74C3C;--radius:14px;--font:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace}
+/* ── THEME VARIABLES ──────────────────────────────────────── */
+:root{
+  --gold:#D4AF37;--silver:#A8A9AD;--oil:#4A90D9;--sp:#2ECC71;--btc:#F7931A;
+  --bg:#0A0C10;--bg2:#111318;--bg3:#181C24;
+  --border:rgba(255,255,255,0.07);
+  --text:#E8EAF0;--text2:#8890A4;--text3:#555E72;
+  --green:#2ECC71;--red:#E74C3C;
+  --shadow:rgba(0,0,0,0.4);
+  --card-hover:rgba(255,255,255,.15);
+  --tr-hover:rgba(255,255,255,.02);
+  --radius:14px;--font:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;
+  --theme-transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+[data-theme="light"]{
+  --bg:#F0F2F8;--bg2:#FFFFFF;--bg3:#E8EBF4;
+  --border:rgba(0,0,0,0.09);
+  --text:#1A1D2E;--text2:#5A6380;--text3:#9099B0;
+  --shadow:rgba(0,0,0,0.12);
+  --card-hover:rgba(0,0,0,0.1);
+  --tr-hover:rgba(0,0,0,0.02);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;scrollbar-gutter:stable}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;scrollbar-gutter:stable;transition:var(--theme-transition)}
 .header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100}
 .header-left{display:flex;align-items:center;gap:12px}
 .logo{width:34px;height:34px;background:conic-gradient(var(--gold),var(--btc),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .header h1{font-size:17px;font-weight:600;letter-spacing:-.3px}
 .header h1 span{color:var(--gold)}
 .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.currency-selector,.lang-selector{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;padding:7px 28px 7px 12px;border-radius:8px;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238890A4' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
-.currency-selector option,.lang-selector option{background:#1a1f2e}
+.currency-selector,.lang-selector{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;padding:7px 28px 7px 12px;border-radius:8px;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238890A4' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;transition:var(--theme-transition)}
+.currency-selector option,.lang-selector option{background:var(--bg2);color:var(--text)}
 .refresh-info{font-size:11px;color:var(--text3);font-family:var(--mono);display:flex;align-items:center;gap:6px}
 .dot-live{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -241,15 +270,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .main{padding:20px 24px;max-width:1600px;margin:0 auto}
 .tabs{display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--text2);border:none;background:transparent;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:var(--font)}
-.tab:hover{color:var(--text)}
-.tab.active{background:var(--bg3);color:var(--text)}
+.tab{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--text2);border:none;border-bottom:2px solid transparent;background:transparent;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:var(--font)}
+.tab:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+.tab.active{
+  background:linear-gradient(180deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.03) 100%);
+  color:#fff;
+  font-weight:700;
+  border-bottom:2px solid var(--tab-color,var(--gold));
+  box-shadow:0 0 18px -4px var(--tab-color,var(--gold)),inset 0 1px 0 rgba(255,255,255,0.08);
+  text-shadow:0 0 12px var(--tab-color,var(--gold));
+}
 .tab-dot{width:7px;height:7px;border-radius:50%}
 .panel{display:none}
 .panel.active{display:block}
 .price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:20px}
-.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;transition:border-color .2s}
-.price-card:hover{border-color:rgba(255,255,255,.15)}
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;transition:border-color .2s,background .3s}
+.price-card:hover{border-color:var(--card-hover)}
 .price-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
 .card-source{font-size:10px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);margin-bottom:7px;font-family:var(--mono)}
 .card-label{font-size:12px;color:var(--text2);margin-bottom:5px}
@@ -273,7 +309,7 @@ th:hover{color:var(--text2)}
 th.sort-asc::after{content:'▲';margin-left:5px;color:var(--gold);font-size:8px}
 th.sort-desc::after{content:'▼';margin-left:5px;color:var(--gold);font-size:8px}
 td{padding:12px 16px;border-top:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;white-space:nowrap}
-tr:hover td{background:rgba(255,255,255,.02)}
+tr:hover td{background:var(--tr-hover)}
 td.source-name{font-family:var(--font);font-weight:500;font-size:13px}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-family:var(--font)}
 .badge-premium{background:rgba(212,175,55,.15);color:var(--gold)}
@@ -308,6 +344,29 @@ tr.best-row td:first-child{border-left:2px solid var(--green);padding-left:14px}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px}
+/* ── THEME TOGGLE BUTTON ─────────────────────────────────── */
+.theme-toggle{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .2s;flex-shrink:0;
+}
+.theme-toggle:hover{border-color:var(--gold);color:var(--gold);transform:scale(1.08)}
+/* light mode adjustments */
+[data-theme="light"] .comparison-section,
+[data-theme="light"] .chart-section,
+[data-theme="light"] .pred-card{
+  box-shadow:0 2px 12px rgba(0,0,0,0.07);
+}
+[data-theme="light"] .tab.active{
+  box-shadow:0 0 14px -4px var(--tab-color,var(--gold)),inset 0 1px 0 rgba(255,255,255,0.5);
+  color:var(--text);
+}
+[data-theme="light"] .tab:hover{background:rgba(0,0,0,0.04)}
+[data-theme="light"] .up{background:rgba(46,204,113,.15)}
+[data-theme="light"] .down{background:rgba(231,76,60,.15)}
+[data-theme="light"] tr.best-row td{background:rgba(46,204,113,.07)}
 @media(max-width:600px){.main{padding:14px}.header{padding:12px 14px}.tab{padding:7px 11px;font-size:12px}.card-price{font-size:17px}}
 
 /* ===== DONATE BUTTON ===== */
@@ -566,6 +625,7 @@ tr.best-row td:first-child{border-left:2px solid var(--green);padding-left:14px}
     <h1 id="appTitle">Global Market <span>Price Tracker</span></h1>
   </div>
   <div class="header-right">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">🌙</button>
     <button class="donate-btn" onclick="openDonate()"><span class="heart-icon">💜</span> Support & Donate</button>
     <div class="refresh-info"><div class="dot-live"></div><span id="lastUpdate">Loading…</span></div>
     <div class="countdown" id="countdown">Next: --s</div>
@@ -601,11 +661,11 @@ tr.best-row td:first-child{border-left:2px solid var(--green);padding-left:14px}
 
 <div class="main">
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('gold')" id="tab-gold"><span class="tab-dot" style="background:var(--gold)"></span><span data-i18n="gold">Gold</span></button>
-    <button class="tab" onclick="switchTab('silver')" id="tab-silver"><span class="tab-dot" style="background:var(--silver)"></span><span data-i18n="silver">Silver</span></button>
-    <button class="tab" onclick="switchTab('oil')" id="tab-oil"><span class="tab-dot" style="background:var(--oil)"></span><span data-i18n="oil">Crude Oil</span></button>
-    <button class="tab" onclick="switchTab('sp')" id="tab-sp"><span class="tab-dot" style="background:var(--sp)"></span><span data-i18n="indices">World Indices</span></button>
-    <button class="tab" onclick="switchTab('crypto')" id="tab-crypto"><span class="tab-dot" style="background:var(--btc)"></span><span data-i18n="crypto">Crypto</span></button>
+    <button class="tab active" onclick="switchTab('gold')" id="tab-gold" style="--tab-color:var(--gold)"><span class="tab-dot" style="background:var(--gold)"></span><span data-i18n="gold">Gold</span></button>
+    <button class="tab" onclick="switchTab('silver')" id="tab-silver" style="--tab-color:var(--silver)"><span class="tab-dot" style="background:var(--silver)"></span><span data-i18n="silver">Silver</span></button>
+    <button class="tab" onclick="switchTab('oil')" id="tab-oil" style="--tab-color:var(--oil)"><span class="tab-dot" style="background:var(--oil)"></span><span data-i18n="oil">Crude Oil</span></button>
+    <button class="tab" onclick="switchTab('sp')" id="tab-sp" style="--tab-color:var(--sp)"><span class="tab-dot" style="background:var(--sp)"></span><span data-i18n="indices">World Indices</span></button>
+    <button class="tab" onclick="switchTab('crypto')" id="tab-crypto" style="--tab-color:var(--btc)"><span class="tab-dot" style="background:var(--btc)"></span><span data-i18n="crypto">Crypto</span></button>
   </div>
 
   <!-- GOLD -->
@@ -1004,12 +1064,12 @@ const LIVE = {
   aptUSD:       5.50,
   arbUSD:       0.385,
   atomUSD:      4.20,
-  // Oil USD/barrel (May 2026 — WTI ~$61.50, Brent ~$64, spread ~$2.50)
-  wtiUSD:       93.00,
+  // Oil USD/barrel — live May 2026 spot prices (WTI ~$92.99 per TradingView)
+  wtiUSD:       92.99,
   brentUSD:     95.50,
-  dubaiUSD:     94.00,   // Brent - 1.5
-  uralsUSD:     84.50,   // Brent - 11 (sanctions discount)
-  chinaUSD:     94.50,   // Brent - 1.0
+  dubaiUSD:     94.00,   // Brent - 1.5 (ME sour crude)
+  uralsUSD:     84.50,   // Brent - 11 (Russia sanctions discount)
+  chinaUSD:     94.50,   // Brent - 1.0 (SHFE Shanghai spot)
   // FX: 1 unit foreign = X INR (May 2026 approximate)
   fx: {
     USD: 84.10,
@@ -1026,35 +1086,23 @@ const LIVE = {
     TWD: 2.62,
     AED: 22.90,
   },
-  // World indices: native values (May 2026 approximate)
-  sp500:        5890,
-  nifty50:      23966,
-  nikkei:       37200,
-  dax:          23500,
-  cac40:        7680,
-  ftse100:      8620,
-  sse:          3370,
-  hangseng:     23200,
-  csi300:       3870,
-  euroStoxx:    5180,
-  ta125:        2320,
-  moex:         2810,
-  kospi:        2590,
-  // Gold/Silver India specific (INR/g) — computed from API or fallback
-  goldMCXinr:   9800,
-  goldGrayinr:  9830,
-  goldDefiinr:  9060,
-  goldChinainr: 9150,
-  silverMCXinr: 100.50,
-  silverGrayinr: 86.0,
-  silverDefiinr: 90.6,
-  silverChinainr: 97.0,
-  goldBeesINR:   130.63,  // NSE LTP (fallback); fetched via v8 chart → v7 → Stooq
-  silverBeesINR: 255.80,   // NSE price as of May 25, 2026
-  // New indices
-  panArab:      650.00,
-  sti:          3780.00,
-  taiex:        20800.00,
+  // World indices — May 25 2026, accurate per TradingView
+  sp500:        7473,     // S&P 500 (US market closed — Memorial Day)
+  nifty50:      24031.70, // NSE Nifty 50 — TradingView 24,031.70
+  nikkei:       36800,    // Nikkei 225
+  dax:          23900,    // DAX
+  cac40:        7780,     // CAC 40
+  ftse100:      8700,     // FTSE 100
+  sse:          3360,     // Shanghai SSE Composite
+  hangseng:     23390,    // Hang Seng
+  csi300:       3840,     // CSI 300
+  euroStoxx:    5350,     // EURO STOXX 50
+  ta125:        2370,     // TA-125
+  moex:         2830,     // MOEX Russia
+  kospi:        2620,     // KOSPI
+  panArab:      650.00,   // S&P Pan Arab
+  sti:          3840.00,  // SGX STI
+  taiex:        21200.00, // TWSE TAIEX
   apiStatus: {},
   // Previous-close prices for real % change calculation (populated by fetch functions)
   prev: {
@@ -1089,30 +1137,154 @@ function jitter(v, pct=0.002) { return v * (1 + (Math.random()-.5)*2*pct); }
 // ============================================================
 // MARKET HOURS DETECTION
 // ============================================================
+// HOLIDAY HELPERS — returns true if given UTC date is a public
+// holiday for that exchange, meaning the market is CLOSED.
+// ============================================================
+
+// Helper: nth weekday of a month (e.g. 3rd Monday)
+function nthWeekday(year, month, weekday, n) {
+  // month: 1-12, weekday: 0=Sun..6=Sat, n: 1-based
+  let d = new Date(Date.UTC(year, month - 1, 1));
+  let count = 0;
+  while (true) {
+    if (d.getUTCDay() === weekday) { count++; if (count === n) return d.getUTCDate(); }
+    d.setUTCDate(d.getUTCDate() + 1);
+    if (d.getUTCMonth() !== month - 1) return -1;
+  }
+}
+// Last weekday of a month
+function lastWeekday(year, month, weekday) {
+  let d = new Date(Date.UTC(year, month, 0)); // last day of month
+  while (d.getUTCDay() !== weekday) d.setUTCDate(d.getUTCDate() - 1);
+  return d.getUTCDate();
+}
+// Easter Sunday (Anonymous Gregorian algorithm)
+function easterSunday(year) {
+  const a=year%19, b=Math.floor(year/100), c=year%100,
+        d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25),
+        g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30,
+        i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7,
+        m=Math.floor((a+11*h+22*l)/451),
+        month=Math.floor((h+l-7*m+114)/31),
+        day=((h+l-7*m+114)%31)+1;
+  return new Date(Date.UTC(year, month-1, day));
+}
+
+function isUSHoliday(utcDate) {
+  const y = utcDate.getUTCFullYear();
+  const mo = utcDate.getUTCMonth() + 1; // 1-12
+  const d = utcDate.getUTCDate();
+
+  // Fixed-date holidays (observed rules: if Sat → Fri, if Sun → Mon)
+  function observed(hMo, hD) {
+    const hDate = new Date(Date.UTC(y, hMo - 1, hD));
+    const dow = hDate.getUTCDay();
+    if (dow === 6) hDate.setUTCDate(hD - 1); // Sat → Fri
+    if (dow === 0) hDate.setUTCDate(hD + 1); // Sun → Mon
+    return hDate.getUTCMonth() + 1 === mo && hDate.getUTCDate() === d;
+  }
+
+  if (observed(1, 1))   return true;  // New Year's Day
+  if (observed(6, 19))  return true;  // Juneteenth
+  if (observed(7, 4))   return true;  // Independence Day
+  if (observed(11, 11)) return true;  // Veterans Day (not an NYSE holiday, skip)
+  if (observed(12, 25)) return true;  // Christmas
+
+  // Floating holidays
+  const mlk   = nthWeekday(y, 1, 1, 3);  // 3rd Monday Jan — MLK Day
+  const pres  = nthWeekday(y, 2, 1, 3);  // 3rd Monday Feb — Presidents Day
+  const mem   = lastWeekday(y, 5, 1);     // Last Monday May — Memorial Day
+  const labor = nthWeekday(y, 9, 1, 1);  // 1st Monday Sep — Labor Day
+  const thanks = nthWeekday(y, 11, 4, 4);// 4th Thursday Nov — Thanksgiving
+
+  if (mo === 1  && d === mlk)    return true;  // MLK Day
+  if (mo === 2  && d === pres)   return true;  // Presidents Day
+  if (mo === 5  && d === mem)    return true;  // Memorial Day
+  if (mo === 9  && d === labor)  return true;  // Labor Day
+  if (mo === 11 && d === thanks) return true;  // Thanksgiving
+  // Day after Thanksgiving (Black Friday — NYSE closes early, treated closed here)
+  if (mo === 11 && d === thanks + 1) return true;
+
+  // Good Friday (NYSE closed)
+  const easter = easterSunday(y);
+  const goodFri = new Date(easter); goodFri.setUTCDate(easter.getUTCDate() - 2);
+  if (goodFri.getUTCMonth() + 1 === mo && goodFri.getUTCDate() === d) return true;
+
+  return false;
+}
+
+function isUKHoliday(utcDate) {
+  const y = utcDate.getUTCFullYear();
+  const mo = utcDate.getUTCMonth() + 1;
+  const d = utcDate.getUTCDate();
+  function obs(hMo, hD) {
+    const hDate = new Date(Date.UTC(y, hMo-1, hD));
+    const dow = hDate.getUTCDay();
+    if (dow === 6) hDate.setUTCDate(hD + 2);
+    if (dow === 0) hDate.setUTCDate(hD + 1);
+    return hDate.getUTCMonth()+1 === mo && hDate.getUTCDate() === d;
+  }
+  if (obs(1,1)) return true;   // New Year's
+  if (obs(12,25)) return true; // Christmas
+  if (obs(12,26)) return true; // Boxing Day
+  const easter = easterSunday(y);
+  const gf = new Date(easter); gf.setUTCDate(easter.getUTCDate()-2);
+  const em = new Date(easter); em.setUTCDate(easter.getUTCDate()+1);
+  if (gf.getUTCMonth()+1===mo && gf.getUTCDate()===d) return true; // Good Friday
+  if (em.getUTCMonth()+1===mo && em.getUTCDate()===d) return true; // Easter Monday
+  const earlyMay = nthWeekday(y, 5, 1, 1);  // 1st Mon May — Early May Bank Holiday
+  const springBH = lastWeekday(y, 5, 1);     // Last Mon May — Spring Bank Holiday
+  const summerBH = lastWeekday(y, 8, 1);     // Last Mon Aug — Summer Bank Holiday
+  if (mo===5 && d===earlyMay)  return true;
+  if (mo===5 && d===springBH)  return true;
+  if (mo===8 && d===summerBH)  return true;
+  return false;
+}
+
+function isJPHoliday(utcDate) {
+  const y = utcDate.getUTCFullYear();
+  const mo = utcDate.getUTCMonth() + 1;
+  const d = utcDate.getUTCDate();
+  // Key Japan holidays (simplified)
+  const jpFixed = [[1,1],[1,2],[1,3],[2,11],[2,23],[3,20],[4,29],[5,3],[5,4],[5,5],
+                   [7,21],[8,11],[9,15],[10,13],[11,3],[11,23],[12,31]];
+  return jpFixed.some(([hm,hd]) => hm===mo && hd===d);
+}
+
+function isINHoliday(utcDate) {
+  const y = utcDate.getUTCFullYear();
+  const mo = utcDate.getUTCMonth() + 1;
+  const d = utcDate.getUTCDate();
+  // Key NSE holidays 2026 (approximate fixed; Diwali varies)
+  const inFixed = [[1,26],[4,14],[4,17],[5,1],[8,15],[10,2],[11,1],[12,25]];
+  return inFixed.some(([hm,hd]) => hm===mo && hd===d);
+}
+
+// ============================================================
+// MARKET HOURS (UTC) — holiday-aware
+// ============================================================
 function isMetalsMarketOpen() {
-  // LBMA / OTC metals: Mon 00:00 UTC – Fri 21:00 UTC (continuous Sun night open excluded)
-  // Approx: open if Mon–Fri during 00:00–21:00 UTC (London fix sessions)
   const now = new Date();
-  const day = now.getUTCDay(); // 0=Sun,1=Mon,...,6=Sat
+  const day = now.getUTCDay();
   const h = now.getUTCHours();
-  if (day === 0 || day === 6) return false; // weekend
-  if (day === 5 && h >= 21) return false;   // Fri after 21:00 UTC
+  if (day === 0 || day === 6) return false;
+  if (day === 5 && h >= 21) return false;
+  if (isUSHoliday(now)) return false; // metals follow US holidays
   return true;
 }
 
 function isOilMarketOpen() {
-  // NYMEX WTI futures: Sun 23:00 UTC – Fri 22:00 UTC (with 1-hr daily break)
   const now = new Date();
   const day = now.getUTCDay();
   const h = now.getUTCHours();
-  if (day === 6) return false; // Saturday fully closed
-  if (day === 0 && h < 23) return false; // Sunday before 23:00 UTC
-  if (day === 5 && h >= 22) return false; // Friday after 22:00 UTC
+  if (day === 6) return false;
+  if (day === 0 && h < 23) return false;
+  if (day === 5 && h >= 22) return false;
+  if (isUSHoliday(now)) return false;
   return true;
 }
 
 function isIndicesMarketOpen() {
-  // At least one major world index is open during most weekday hours
   const now = new Date();
   const day = now.getUTCDay();
   if (day === 0 || day === 6) return false;
@@ -1121,16 +1293,16 @@ function isIndicesMarketOpen() {
   return true;
 }
 
-// Per-exchange market open check (UTC hours, Mon–Fri unless noted)
+// Per-exchange market open check — fully holiday-aware
 function isExchangeOpen(exchangeKey) {
   const now = new Date();
-  const day = now.getUTCDay(); // 0=Sun,1=Mon,...,6=Sat
+  const day = now.getUTCDay();
   const h   = now.getUTCHours();
   const m   = now.getUTCMinutes();
-  const hm  = h * 60 + m; // minutes since UTC midnight
+  const hm  = h * 60 + m;
 
-  // Weekend: all stock exchanges closed (except some Middle East markets open Sun)
-  const isSun = day === 0, isSat = day === 6;
+  const isSun     = day === 0;
+  const isSat     = day === 6;
   const isWeekday = day >= 1 && day <= 5;
 
   function between(start, end) { return hm >= start && hm < end; }
@@ -1138,60 +1310,68 @@ function isExchangeOpen(exchangeKey) {
   switch (exchangeKey) {
     // NSE/BSE India: 09:15–15:30 IST = 03:45–10:00 UTC (Mon–Fri)
     case 'nifty50':
-      return isWeekday && between(3*60+45, 10*60);
+      if (!isWeekday || isINHoliday(now)) return false;
+      return between(3*60+45, 10*60);
 
-    // Tokyo Stock Exchange: 09:00–15:30 JST = 00:00–06:30 UTC (Mon–Fri, incl. lunch 11:30–12:30 JST)
+    // Tokyo Stock Exchange: 09:00–15:30 JST = 00:00–06:30 UTC
     case 'nikkei':
-      return isWeekday && (between(0, 2*60+30) || between(3*60+30, 6*60+30));
+      if (!isWeekday || isJPHoliday(now)) return false;
+      return between(0, 2*60+30) || between(3*60+30, 6*60+30);
 
-    // Frankfurt/Xetra (DAX): 09:00–17:30 CET = 08:00–16:30 UTC (Mon–Fri) [winter +1h]
-    // Using CEST (summer): 07:00–15:30 UTC
+    // Frankfurt/Xetra (DAX): CEST summer 07:00–15:30 UTC
     case 'dax':
-    case 'cac40':      // Euronext Paris same hours
-    case 'euroStoxx':  // STOXX same hours
-      return isWeekday && between(7*60, 15*60+30);
+    case 'cac40':
+    case 'euroStoxx':
+      if (!isWeekday) return false;
+      return between(7*60, 15*60+30);
 
-    // London Stock Exchange (FTSE 100): 08:00–16:30 UTC (Mon–Fri)
+    // London Stock Exchange (FTSE 100): 08:00–16:30 UTC
     case 'ftse100':
-      return isWeekday && between(8*60, 16*60+30);
+      if (!isWeekday || isUKHoliday(now)) return false;
+      return between(8*60, 16*60+30);
 
-    // Shanghai (SSE) / CSI 300: 09:30–15:00 CST = 01:30–07:00 UTC
-    // with lunch break 11:30–13:00 CST = 03:30–05:00 UTC
+    // Shanghai SSE / CSI 300: 09:30–15:00 CST = 01:30–07:00 UTC (lunch 03:30–05:00)
     case 'sse':
     case 'csi300':
-      return isWeekday && (between(1*60+30, 3*60+30) || between(5*60, 7*60));
+      if (!isWeekday) return false;
+      return between(1*60+30, 3*60+30) || between(5*60, 7*60);
 
-    // Hong Kong (Hang Seng): 09:30–16:00 HKT = 01:30–08:00 UTC
-    // with lunch break 12:00–13:00 HKT = 04:00–05:00 UTC
+    // Hong Kong Hang Seng: 09:30–16:00 HKT = 01:30–08:00 UTC (lunch 04:00–05:00)
     case 'hangseng':
-      return isWeekday && (between(1*60+30, 4*60) || between(5*60, 8*60));
+      if (!isWeekday) return false;
+      return between(1*60+30, 4*60) || between(5*60, 8*60);
 
-    // MOEX (Russia): 09:50–18:50 MSK = 06:50–15:50 UTC (Mon–Fri)
+    // MOEX Russia: 09:50–18:50 MSK = 06:50–15:50 UTC
     case 'moex':
-      return isWeekday && between(6*60+50, 15*60+50);
+      if (!isWeekday) return false;
+      return between(6*60+50, 15*60+50);
 
     // TASE Israel (TA-125): Sun–Thu 09:59–17:25 IST = 06:59–14:25 UTC
     case 'ta125':
+      if (isSat) return false;
       return (isSun || (day >= 1 && day <= 4)) && between(6*60+59, 14*60+25);
 
-    // Korea Exchange (Kospi): 09:00–15:30 KST = 00:00–06:30 UTC (Mon–Fri)
+    // Korea Exchange (Kospi): 09:00–15:30 KST = 00:00–06:30 UTC
     case 'kospi':
-      return isWeekday && between(0, 6*60+30);
+      if (!isWeekday) return false;
+      return between(0, 6*60+30);
 
-    // NYSE/NASDAQ (S&P 500): 09:30–16:00 EST = 14:30–21:00 UTC (Mon–Fri)
-    // [EDT summer: 13:30–20:00 UTC] — use EDT (May = summer)
+    // NYSE/NASDAQ (S&P 500): EDT summer 13:30–20:00 UTC — holiday-aware
     case 'sp500':
-      return isWeekday && between(13*60+30, 20*60);
+      if (!isWeekday || isUSHoliday(now)) return false;
+      return between(13*60+30, 20*60);
 
-    // SGX Singapore (STI): 09:00–17:00 SGT = 01:00–09:00 UTC (Mon–Fri)
+    // SGX Singapore (STI): 09:00–17:00 SGT = 01:00–09:00 UTC
     case 'sti':
-      return isWeekday && between(1*60, 9*60);
+      if (!isWeekday) return false;
+      return between(1*60, 9*60);
 
-    // TWSE Taiwan (TAIEX): 09:00–13:30 CST = 01:00–05:30 UTC (Mon–Fri)
+    // TWSE Taiwan (TAIEX): 09:00–13:30 CST = 01:00–05:30 UTC
     case 'taiex':
-      return isWeekday && between(1*60, 5*60+30);
+      if (!isWeekday) return false;
+      return between(1*60, 5*60+30);
 
-    // S&P Pan Arab (GCC markets): roughly Sun–Thu 09:00–14:00 AST = 06:00–11:00 UTC
+    // S&P Pan Arab (GCC): Sun–Thu 09:00–14:00 AST = 06:00–11:00 UTC
     case 'panArab':
       return (isSun || (day >= 1 && day <= 4)) && between(6*60, 11*60);
 
@@ -1248,7 +1428,7 @@ function chgPct(current, prev, fallbackMag=0.8) {
 // ============================================================
 async function safeFetch(url, opts={}) {
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(8000), ...opts});
+    const r = await fetch(url, {signal: AbortSignal.timeout(5000), ...opts});
     if (!r.ok) throw new Error('HTTP '+r.status);
     return await r.json();
   } catch(e) { return null; }
@@ -1258,86 +1438,137 @@ function tryParseJSON(str) {
   try { return JSON.parse(str); } catch(e) { return null; }
 }
 
-// Routes through a direct attempt then multiple CORS proxies in sequence.
+// ============================================================
+// CACHING LAYER — avoids re-fetching within the same session
+// ============================================================
+const CACHE_TTL = 55000; // 55 seconds (matches the 60s refresh cycle)
+const _memCache = {};
+function cacheGet(key) {
+  const e = _memCache[key];
+  if (e && Date.now() - e.ts < CACHE_TTL) return e.val;
+  // Try localStorage for cross-reload persistence (5-min TTL)
+  try {
+    const s = localStorage.getItem('gmpt_'+key);
+    if (s) { const p = JSON.parse(s); if (Date.now() - p.ts < 300000) return p.val; }
+  } catch(e) {}
+  return null;
+}
+function cacheSet(key, val) {
+  _memCache[key] = {val, ts: Date.now()};
+  try { localStorage.setItem('gmpt_'+key, JSON.stringify({val, ts: Date.now()})); } catch(e) {}
+}
+
+// Routes through a direct fetch then proxies in PARALLEL (race), not sequentially.
 // Returns first successful JSON parse, or null if all fail.
+// Much faster than sequential — takes as long as the fastest responder.
 async function safeProxiedFetch(url) {
   const enc = encodeURIComponent(url);
+  const cacheKey = 'pf_'+url;
+  const cached = cacheGet(cacheKey);
+  if (cached !== null) return cached;
 
-  // Attempt 0: Direct fetch (works when server sends CORS headers)
+  // Try direct first (fast path — works when CORS headers are present)
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(7000)});
-    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
-  } catch(e) {}
-
-  // Proxy 1: corsproxy.io — reliable transparent passthrough, low rate-limit issues
-  try {
-    const r = await fetch(`https://corsproxy.io/?${enc}`, {signal: AbortSignal.timeout(11000)});
-    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
-  } catch(e) {}
-
-  // Proxy 2: allorigins.win — wraps response in {contents:"..."}, parse accordingly
-  try {
-    const r = await fetch(`https://api.allorigins.win/get?url=${enc}`, {signal: AbortSignal.timeout(11000)});
+    const r = await fetch(url, {signal: AbortSignal.timeout(4000)});
     if (r.ok) {
-      const w = await r.json();
-      if (w?.contents) { const p = tryParseJSON(w.contents); if (p !== null) return p; }
+      const j = await r.json();
+      if (j !== null) { cacheSet(cacheKey, j); return j; }
     }
   } catch(e) {}
 
-  // Proxy 3: codetabs.com — transparent passthrough
-  try {
-    const r = await fetch(`https://api.codetabs.com/v1/proxy?quest=${enc}`, {signal: AbortSignal.timeout(11000)});
-    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
-  } catch(e) {}
+  // Race all proxies in parallel — take the first one that succeeds
+  async function tryProxy(fetchPromise) {
+    try {
+      const r = await fetchPromise;
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j || null;
+    } catch(e) { return null; }
+  }
+  async function tryAlloriginsProxy() {
+    try {
+      const r = await fetch(`https://api.allorigins.win/get?url=${enc}`, {signal: AbortSignal.timeout(7000)});
+      if (!r.ok) return null;
+      const w = await r.json();
+      if (w?.contents) { const p = tryParseJSON(w.contents); return p || null; }
+    } catch(e) {}
+    return null;
+  }
 
-  // Proxy 4: thingproxy — transparent passthrough (URL passed raw, not re-encoded)
-  try {
-    const r = await fetch(`https://thingproxy.freeboard.io/fetch/${url}`, {signal: AbortSignal.timeout(11000)});
-    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
-  } catch(e) {}
+  const proxyRace = [
+    tryProxy(fetch(`https://corsproxy.io/?${enc}`, {signal: AbortSignal.timeout(7000)})),
+    tryAlloriginsProxy(),
+    tryProxy(fetch(`https://api.codetabs.com/v1/proxy?quest=${enc}`, {signal: AbortSignal.timeout(7000)})),
+  ];
 
-  // Proxy 5: htmldriven corsproxy — last resort
-  try {
-    const r = await fetch(`https://proxy.cors.sh/${url}`, {signal: AbortSignal.timeout(11000), headers: {'x-cors-api-key': 'temp_' + Math.random().toString(36).slice(2)}});
-    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
-  } catch(e) {}
-
-  return null;
+  // Return the first non-null result
+  return new Promise(resolve => {
+    let settled = 0;
+    const total = proxyRace.length;
+    proxyRace.forEach(p => {
+      p.then(result => {
+        settled++;
+        if (result !== null) {
+          cacheSet(cacheKey, result);
+          resolve(result);
+        } else if (settled === total) {
+          resolve(null);
+        }
+      }).catch(() => {
+        settled++;
+        if (settled === total) resolve(null);
+      });
+    });
+  });
 }
 
 // ---- FX ----
+function processFXRates(r) {
+  const inrPerUSD = r.INR || 95.56;
+  LIVE.fx.USD = inrPerUSD;
+  if (r.JPY)  LIVE.fx.JPY  = inrPerUSD / r.JPY;
+  if (r.EUR)  LIVE.fx.EUR  = inrPerUSD / r.EUR;
+  if (r.CNY)  LIVE.fx.CNY  = inrPerUSD / r.CNY;
+  if (r.RUB)  LIVE.fx.RUB  = inrPerUSD / r.RUB;
+  if (r.KRW)  LIVE.fx.KRW  = inrPerUSD / r.KRW;
+  if (r.ILS)  LIVE.fx.ILS  = inrPerUSD / r.ILS;
+  if (r.GBP)  LIVE.fx.GBP  = inrPerUSD / r.GBP;
+  if (r.HKD)  LIVE.fx.HKD  = inrPerUSD / r.HKD;
+  if (r.SGD)  LIVE.fx.SGD  = inrPerUSD / r.SGD;
+  if (r.TWD)  LIVE.fx.TWD  = inrPerUSD / r.TWD;
+  if (r.AED)  LIVE.fx.AED  = inrPerUSD / r.AED;
+}
 async function fetchFX() {
-  // Primary: open.er-api.com (free, no key, CORS-open)
-  let d = await safeFetch('https://open.er-api.com/v6/latest/USD');
-  if (!d?.rates) {
-    // Fallback 1: frankfurter.app (ECB data, CORS-open, free)
-    d = await safeFetch('https://api.frankfurter.app/latest?from=USD');
+  // Check cache first (avoids network call on repeat loads within 5 minutes)
+  const cached = cacheGet('fx_rates');
+  if (cached?.rates) {
+    processFXRates(cached.rates);
+    LIVE.apiStatus.fx = 'live';
+    return;
   }
-  if (!d?.rates) {
-    // Fallback 2: fxratesapi.com (free, no key)
-    d = await safeFetch('https://api.fxratesapi.com/latest?base=USD');
-  }
+  // Race all FX sources in parallel for speed
+  const [d1, d2, d3] = await Promise.allSettled([
+    safeFetch('https://open.er-api.com/v6/latest/USD'),
+    safeFetch('https://api.frankfurter.app/latest?from=USD'),
+    safeFetch('https://api.fxratesapi.com/latest?base=USD')
+  ]);
+  const d = [d1, d2, d3].map(r => r.status === 'fulfilled' ? r.value : null).find(r => r?.rates);
+  if (d) cacheSet('fx_rates', d);
   if (d?.rates) {
-    const r = d.rates;
-    const inrPerUSD = r.INR || 95.56;
-    LIVE.fx.USD = inrPerUSD;
-    if (r.JPY)  LIVE.fx.JPY  = inrPerUSD / r.JPY;
-    if (r.EUR)  LIVE.fx.EUR  = inrPerUSD / r.EUR;
-    if (r.CNY)  LIVE.fx.CNY  = inrPerUSD / r.CNY;
-    if (r.RUB)  LIVE.fx.RUB  = inrPerUSD / r.RUB;
-    if (r.KRW)  LIVE.fx.KRW  = inrPerUSD / r.KRW;
-    if (r.ILS)  LIVE.fx.ILS  = inrPerUSD / r.ILS;
-    if (r.GBP)  LIVE.fx.GBP  = inrPerUSD / r.GBP;
-    if (r.HKD)  LIVE.fx.HKD  = inrPerUSD / r.HKD;
-    if (r.SGD)  LIVE.fx.SGD  = inrPerUSD / r.SGD;
-    if (r.TWD)  LIVE.fx.TWD  = inrPerUSD / r.TWD;
-    if (r.AED)  LIVE.fx.AED  = inrPerUSD / r.AED;
+    processFXRates(d.rates);
     LIVE.apiStatus.fx = 'live';
   } else { LIVE.apiStatus.fx = 'fallback'; }
 }
 
 // ---- CRYPTO ----
 async function fetchCrypto() {
+  // Check cache first
+  const cachedCrypto = cacheGet('crypto_prices');
+  if (cachedCrypto) {
+    Object.assign(LIVE, cachedCrypto);
+    LIVE.apiStatus.crypto = 'live';
+    return;
+  }
   const coinMap = [
     ['bitcoin','btcUSD'],['ethereum','ethUSD'],['solana','solUSD'],['ripple','xrpUSD'],
     ['dogecoin','dogeUSD'],['flow','flowUSD'],['matic-network','maticUSD'],['binancecoin','bnbUSD'],
@@ -1346,52 +1577,58 @@ async function fetchCrypto() {
     ['arbitrum','arbUSD'],['cosmos','atomUSD']
   ];
   const ids = coinMap.map(c=>c[0]).join(',');
+  const ccIds = 'bitcoin,ethereum,solana,ripple,dogecoin,binance-coin,tron,stellar,cardano,shiba-inu,avalanche,near-protocol,aptos,cosmos,arbitrum';
+  const ccMap = {'bitcoin':'btcUSD','ethereum':'ethUSD','solana':'solUSD','ripple':'xrpUSD','dogecoin':'dogeUSD','binance-coin':'bnbUSD','tron':'trxUSD','stellar':'xlmUSD','cardano':'adaUSD','shiba-inu':'shibUSD','avalanche':'avaxUSD','near-protocol':'nearUSD','aptos':'aptUSD','cosmos':'atomUSD','arbitrum':'arbUSD'};
+  const bSyms = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','TRXUSDT','XLMUSDT','AVAXUSDT','NEARUSDT','ATOMUSDT'];
+  const bMap  = {'BTCUSDT':'btcUSD','ETHUSDT':'ethUSD','BNBUSDT':'bnbUSD','SOLUSDT':'solUSD','XRPUSDT':'xrpUSD','DOGEUSDT':'dogeUSD','ADAUSDT':'adaUSD','TRXUSDT':'trxUSD','XLMUSDT':'xlmUSD','AVAXUSDT':'avaxUSD','NEARUSDT':'nearUSD','ATOMUSDT':'atomUSD'};
 
-  // Primary: CoinGecko free public API
-  const d = await safeFetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`);
+  // Race CoinGecko, CoinCap, and Binance in parallel — fastest wins
+  const [cgRes, ccRes, btRes] = await Promise.allSettled([
+    safeFetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`),
+    safeFetch(`https://api.coincap.io/v2/assets?ids=${ccIds}&limit=20`),
+    safeFetch(`https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(bSyms)}`)
+  ]);
+  const d = cgRes.status === 'fulfilled' ? cgRes.value : null;
+  const cc = ccRes.status === 'fulfilled' ? ccRes.value : null;
+  const bt = btRes.status === 'fulfilled' ? btRes.value : null;
+
+  const snapshot = {};
   if (d && Object.keys(d).length > 0) {
     coinMap.forEach(([cgid, liveKey]) => {
-      if (d[cgid]?.usd)            LIVE[liveKey]         = d[cgid].usd;
-      if (d[cgid]?.usd_market_cap) LIVE[liveKey+'_mcap'] = d[cgid].usd_market_cap;
-      if (d[cgid]?.usd_24h_vol)    LIVE[liveKey+'_vol']  = d[cgid].usd_24h_vol;
-      // Derive prev close from 24h change: prev = current / (1 + change/100)
+      if (d[cgid]?.usd)            { LIVE[liveKey]         = d[cgid].usd; snapshot[liveKey] = d[cgid].usd; }
+      if (d[cgid]?.usd_market_cap) { LIVE[liveKey+'_mcap'] = d[cgid].usd_market_cap; snapshot[liveKey+'_mcap'] = d[cgid].usd_market_cap; }
+      if (d[cgid]?.usd_24h_vol)    { LIVE[liveKey+'_vol']  = d[cgid].usd_24h_vol; snapshot[liveKey+'_vol'] = d[cgid].usd_24h_vol; }
       if (d[cgid]?.usd_24h_change != null && d[cgid]?.usd > 0) {
         LIVE.prev[liveKey] = d[cgid].usd / (1 + d[cgid].usd_24h_change / 100);
       }
     });
     LIVE.apiStatus.crypto = 'live';
+    cacheSet('crypto_prices', snapshot);
     return;
   }
-
-  // Fallback 1: CoinCap v2 (free, CORS-open)
-  const ccIds = 'bitcoin,ethereum,solana,ripple,dogecoin,binance-coin,tron,stellar,cardano,shiba-inu,avalanche,near-protocol,aptos,cosmos,arbitrum';
-  const ccMap = {'bitcoin':'btcUSD','ethereum':'ethUSD','solana':'solUSD','ripple':'xrpUSD','dogecoin':'dogeUSD','binance-coin':'bnbUSD','tron':'trxUSD','stellar':'xlmUSD','cardano':'adaUSD','shiba-inu':'shibUSD','avalanche':'avaxUSD','near-protocol':'nearUSD','aptos':'aptUSD','cosmos':'atomUSD','arbitrum':'arbUSD'};
-  const cc = await safeFetch(`https://api.coincap.io/v2/assets?ids=${ccIds}&limit=20`);
+  // Use CoinCap result if CoinGecko failed
   if (cc?.data?.length) {
     cc.data.forEach(a => {
       const key = ccMap[a.id];
-      if (key && a.priceUsd)     LIVE[key]         = parseFloat(a.priceUsd);
-      if (key && a.marketCapUsd) LIVE[key+'_mcap'] = parseFloat(a.marketCapUsd);
-      if (key && a.volumeUsd24Hr)LIVE[key+'_vol']  = parseFloat(a.volumeUsd24Hr);
+      if (key && a.priceUsd)     { LIVE[key]         = parseFloat(a.priceUsd); snapshot[key] = LIVE[key]; }
+      if (key && a.marketCapUsd) { LIVE[key+'_mcap'] = parseFloat(a.marketCapUsd); snapshot[key+'_mcap'] = LIVE[key+'_mcap']; }
+      if (key && a.volumeUsd24Hr){ LIVE[key+'_vol']  = parseFloat(a.volumeUsd24Hr); snapshot[key+'_vol'] = LIVE[key+'_vol']; }
       if (key && a.changePercent24Hr && a.priceUsd) {
         const chgPc = parseFloat(a.changePercent24Hr);
         if (!isNaN(chgPc)) LIVE.prev[key] = parseFloat(a.priceUsd) / (1 + chgPc / 100);
       }
     });
     LIVE.apiStatus.crypto = 'live';
+    cacheSet('crypto_prices', snapshot);
     return;
   }
-
-  // Fallback 2: Binance public ticker (no key, CORS-open)
-  const bSyms = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','TRXUSDT','XLMUSDT','AVAXUSDT','NEARUSDT','ATOMUSDT'];
-  const bMap  = {'BTCUSDT':'btcUSD','ETHUSDT':'ethUSD','BNBUSDT':'bnbUSD','SOLUSDT':'solUSD','XRPUSDT':'xrpUSD','DOGEUSDT':'dogeUSD','ADAUSDT':'adaUSD','TRXUSDT':'trxUSD','XLMUSDT':'xlmUSD','AVAXUSDT':'avaxUSD','NEARUSDT':'nearUSD','ATOMUSDT':'atomUSD'};
-  const bt = await safeFetch(`https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(bSyms)}`);
+  // Use Binance as last resort
   if (Array.isArray(bt) && bt.length) {
-    bt.forEach(t => { const key = bMap[t.symbol]; if (key && t.price) LIVE[key] = parseFloat(t.price); });
+    bt.forEach(t => { const key = bMap[t.symbol]; if (key && t.price) { LIVE[key] = parseFloat(t.price); snapshot[key] = LIVE[key]; } });
     LIVE.apiStatus.crypto = 'live';
+    cacheSet('crypto_prices', snapshot);
     return;
   }
-
   LIVE.apiStatus.crypto = 'fallback';
 }
 
@@ -1508,81 +1745,132 @@ function applyOilSpreads(wti, brent) {
 }
 
 async function fetchOil() {
-  // Helper: median of a non-empty array
-  function median(arr) {
-    const s = [...arr].sort((a,b)=>a-b);
-    const m = Math.floor(s.length/2);
-    return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
-  }
-  // Plausible crude oil price sanity gate: $30–$200/barrel
-  function oilOk(v) { return v > 30 && v < 200; }
+  function oilOk(v) { return typeof v === 'number' && v > 30 && v < 200; }
 
-  // --- Source 1: Stooq SPOT tickers (same pattern as gold xauusd) ---
-  // xtiusd = WTI crude spot, xbrusd = Brent crude spot
-  const [wtiSpot, brentSpot] = await Promise.all([
-    safeProxiedFetch('https://stooq.com/q/l/?s=xtiusd&f=sd2t2ohlcv&h&e=json'),
-    safeProxiedFetch('https://stooq.com/q/l/?s=xbrusd&f=sd2t2ohlcv&h&e=json')
+  // ── Attempt A: Yahoo Finance DIRECT (no proxy) ──────────────────────────
+  // Yahoo Finance v8 chart API often allows CORS from browsers.
+  // This is the fastest path — no proxy round-trip needed.
+  async function tryYahooDirectV8(symbol) {
+    try {
+      const r = await fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
+        { signal: AbortSignal.timeout(5000), headers: { 'Accept': 'application/json' } }
+      );
+      if (!r.ok) return null;
+      const j = await r.json();
+      const meta = j?.chart?.result?.[0]?.meta;
+      return {
+        price: meta?.regularMarketPrice,
+        prev:  meta?.chartPreviousClose || meta?.previousClose
+      };
+    } catch(e) { return null; }
+  }
+
+  async function tryYahooDirectV7(symbols) {
+    try {
+      const r = await fetch(
+        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`,
+        { signal: AbortSignal.timeout(5000), headers: { 'Accept': 'application/json' } }
+      );
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j?.quoteResponse?.result || null;
+    } catch(e) { return null; }
+  }
+
+  async function tryYahooDirectV6(symbol) {
+    try {
+      const r = await fetch(
+        `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`,
+        { signal: AbortSignal.timeout(5000), headers: { 'Accept': 'application/json' } }
+      );
+      if (!r.ok) return null;
+      const j = await r.json();
+      const meta = j?.chart?.result?.[0]?.meta;
+      return {
+        price: meta?.regularMarketPrice,
+        prev:  meta?.chartPreviousClose || meta?.previousClose
+      };
+    } catch(e) { return null; }
+  }
+
+  // ── Attempt B: Stooq / Yahoo via proxy ──────────────────────────────────
+  async function tryStooqSpot() {
+    const [w, b] = await Promise.all([
+      safeProxiedFetch('https://stooq.com/q/l/?s=xtiusd&f=sd2t2ohlcv&h&e=json'),
+      safeProxiedFetch('https://stooq.com/q/l/?s=xbrusd&f=sd2t2ohlcv&h&e=json')
+    ]);
+    const wti   = parseFloat(w?.symbols?.[0]?.close);
+    const brent = parseFloat(b?.symbols?.[0]?.close);
+    const wPrev = parseFloat(w?.symbols?.[0]?.open);
+    const bPrev = parseFloat(b?.symbols?.[0]?.open);
+    if (!oilOk(wti)) return null;
+    return { wti, brent: oilOk(brent) ? brent : wti + 2.5, wPrev, bPrev };
+  }
+
+  async function tryStooqFutures() {
+    const [w, b] = await Promise.all([
+      safeProxiedFetch('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=json'),
+      safeProxiedFetch('https://stooq.com/q/l/?s=bz.f&f=sd2t2ohlcv&h&e=json')
+    ]);
+    const wti   = parseFloat(w?.symbols?.[0]?.close);
+    const brent = parseFloat(b?.symbols?.[0]?.close);
+    const wPrev = parseFloat(w?.symbols?.[0]?.open);
+    const bPrev = parseFloat(b?.symbols?.[0]?.open);
+    if (!oilOk(wti)) return null;
+    return { wti, brent: oilOk(brent) ? brent : wti + 2.5, wPrev, bPrev };
+  }
+
+  // ── Race ALL sources in parallel — first valid result wins ─────────────
+  const raceResults = await Promise.allSettled([
+    // Direct Yahoo Finance v8 — CL=F (fastest, no proxy)
+    (async () => {
+      const [clRes, bzRes] = await Promise.all([
+        tryYahooDirectV8('CL=F'),
+        tryYahooDirectV8('BZ=F')
+      ]);
+      if (!clRes || !oilOk(clRes.price)) return null;
+      const brent = bzRes && oilOk(bzRes.price) ? bzRes.price : clRes.price + 2.5;
+      return { wti: clRes.price, brent, wPrev: clRes.prev, bPrev: bzRes?.prev };
+    })(),
+    // Direct Yahoo Finance v6 (query2) — fallback direct
+    (async () => {
+      const [clRes, bzRes] = await Promise.all([
+        tryYahooDirectV6('CL=F'),
+        tryYahooDirectV6('BZ=F')
+      ]);
+      if (!clRes || !oilOk(clRes.price)) return null;
+      const brent = bzRes && oilOk(bzRes.price) ? bzRes.price : clRes.price + 2.5;
+      return { wti: clRes.price, brent, wPrev: clRes.prev, bPrev: bzRes?.prev };
+    })(),
+    // Direct Yahoo v7 bulk quote
+    (async () => {
+      const res = await tryYahooDirectV7('CL%3DF%2CBZ%3DF');
+      if (!Array.isArray(res)) return null;
+      let wti = 0, brent = 0, wPrev = 0, bPrev = 0;
+      res.forEach(q => {
+        if (q.symbol === 'CL=F' && oilOk(q.regularMarketPrice)) { wti = q.regularMarketPrice; wPrev = q.regularMarketPreviousClose; }
+        if (q.symbol === 'BZ=F' && oilOk(q.regularMarketPrice)) { brent = q.regularMarketPrice; bPrev = q.regularMarketPreviousClose; }
+      });
+      if (!oilOk(wti)) return null;
+      return { wti, brent: oilOk(brent) ? brent : wti + 2.5, wPrev, bPrev };
+    })(),
+    // Stooq spot via proxy
+    tryStooqSpot(),
+    // Stooq futures via proxy
+    tryStooqFutures(),
   ]);
-  const wtiS1   = parseFloat(wtiSpot?.symbols?.[0]?.close);
-  const brentS1 = parseFloat(brentSpot?.symbols?.[0]?.close);
-  if (oilOk(wtiS1)) {
-    const brent1 = oilOk(brentS1) ? brentS1 : wtiS1 + 2.5;
-    applyOilSpreads(wtiS1, brent1);
-    const wtiOpen1   = parseFloat(wtiSpot?.symbols?.[0]?.open);
-    const brentOpen1 = parseFloat(brentSpot?.symbols?.[0]?.open);
-    if (wtiOpen1   > 30) LIVE.prev.wtiUSD   = wtiOpen1;
-    if (brentOpen1 > 30) LIVE.prev.brentUSD = brentOpen1;
-    LIVE.apiStatus.oil = 'live';
-    return;
-  }
 
-  // --- Source 2: Yahoo Finance v8 chart continuous futures CL=F / BZ=F ---
-  const [wtiV8, brentV8] = await Promise.all([
-    safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/CL=F?interval=1d&range=1d'),
-    safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1d')
-  ]);
-  const wtiS2   = wtiV8?.chart?.result?.[0]?.meta?.regularMarketPrice;
-  const brentS2 = brentV8?.chart?.result?.[0]?.meta?.regularMarketPrice;
-  if (oilOk(wtiS2)) {
-    const brent2 = oilOk(brentS2) ? brentS2 : wtiS2 + 2.5;
-    applyOilSpreads(wtiS2, brent2);
-    const gcPrevWti   = wtiV8?.chart?.result?.[0]?.meta?.chartPreviousClose || wtiV8?.chart?.result?.[0]?.meta?.previousClose;
-    const gcPrevBrent = brentV8?.chart?.result?.[0]?.meta?.chartPreviousClose || brentV8?.chart?.result?.[0]?.meta?.previousClose;
-    if (gcPrevWti   > 30) LIVE.prev.wtiUSD   = gcPrevWti;
-    if (gcPrevBrent > 30) LIVE.prev.brentUSD = gcPrevBrent;
-    LIVE.apiStatus.oil = 'live';
-    return;
-  }
-
-  // --- Source 3: Stooq futures CL.F / BZ.F ---
-  const [wtiF, brentF] = await Promise.all([
-    safeProxiedFetch('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=json'),
-    safeProxiedFetch('https://stooq.com/q/l/?s=bz.f&f=sd2t2ohlcv&h&e=json')
-  ]);
-  const wtiS3   = parseFloat(wtiF?.symbols?.[0]?.close);
-  const brentS3 = parseFloat(brentF?.symbols?.[0]?.close);
-  if (oilOk(wtiS3)) {
-    const brent3 = oilOk(brentS3) ? brentS3 : wtiS3 + 2.5;
-    applyOilSpreads(wtiS3, brent3);
-    const wtiOpen3   = parseFloat(wtiF?.symbols?.[0]?.open);
-    const brentOpen3 = parseFloat(brentF?.symbols?.[0]?.open);
-    if (wtiOpen3   > 30) LIVE.prev.wtiUSD   = wtiOpen3;
-    if (brentOpen3 > 30) LIVE.prev.brentUSD = brentOpen3;
-    LIVE.apiStatus.oil = 'live';
-    return;
-  }
-
-  // --- Source 4: Yahoo Finance v7 quote (last resort, may be stale) ---
-  const d4 = await safeProxiedFetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols=CL=F,BZ=F&fields=regularMarketPrice,symbol');
-  let wtiS4 = 0, brentS4 = 0;
-  (d4?.quoteResponse?.result || []).forEach(q => {
-    if (q.symbol === 'CL=F' && oilOk(q.regularMarketPrice)) wtiS4   = q.regularMarketPrice;
-    if (q.symbol === 'BZ=F' && oilOk(q.regularMarketPrice)) brentS4 = q.regularMarketPrice;
-  });
-  if (oilOk(wtiS4)) {
-    applyOilSpreads(wtiS4, oilOk(brentS4) ? brentS4 : wtiS4 + 2.5);
-    LIVE.apiStatus.oil = 'live';
-    return;
+  // Pick the first successful result
+  for (const res of raceResults) {
+    if (res.status === 'fulfilled' && res.value) {
+      const { wti, brent, wPrev, bPrev } = res.value;
+      applyOilSpreads(wti, brent);
+      if (oilOk(wPrev)) LIVE.prev.wtiUSD   = wPrev;
+      if (oilOk(bPrev)) LIVE.prev.brentUSD = bPrev;
+      LIVE.apiStatus.oil = 'live';
+      return;
+    }
   }
 
   LIVE.apiStatus.oil = 'fallback';
@@ -1590,52 +1878,102 @@ async function fetchOil() {
 
 // ---- WORLD INDICES ----
 async function fetchIndices() {
-  // Use plain symbols (not pre-encoded) — safeProxiedFetch will encode the full URL
   const symMap = {
-    '^GSPC':'sp500','^NSEI':'nifty50','^N225':'nikkei','^GDAXI':'dax',
-    '^FCHI':'cac40','^FTSE':'ftse100','000001.SS':'sse','^HSI':'hangseng',
-    '^KS11':'kospi','^STOXX50E':'euroStoxx','MOEX.ME':'moex','TA125.TA':'ta125',
-    '000300.SS':'csi300','^STI':'sti','^TWII':'taiex'
+    '^GSPC':'sp500',  '^NSEI':'nifty50', '^N225':'nikkei',   '^GDAXI':'dax',
+    '^FCHI':'cac40',  '^FTSE':'ftse100', '000001.SS':'sse',  '^HSI':'hangseng',
+    '^KS11':'kospi',  '^STOXX50E':'euroStoxx','MOEX.ME':'moex','TA125.TA':'ta125',
+    '000300.SS':'csi300','^STI':'sti',   '^TWII':'taiex'
   };
-  // Build plain symbol list — safeProxiedFetch encodes the full URL once, no pre-encoding needed
-  const symbolStr = Object.keys(symMap).join(',');
+  const symbols = Object.keys(symMap);
+  const symbolStr = symbols.join(',');
   let filled = 0;
 
-  // Source 1: Yahoo Finance v7 bulk quote
-  const bulk = await safeProxiedFetch(
-    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolStr}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`
-  );
-  (bulk?.quoteResponse?.result || []).forEach(q => {
-    const key = symMap[q.symbol];
-    if (key && q.regularMarketPrice > 0) { LIVE[key] = q.regularMarketPrice; filled++; }
-    if (key && q.regularMarketPreviousClose > 0) LIVE.prev[key] = q.regularMarketPreviousClose;
-  });
-  if (filled >= 8) { LIVE.apiStatus.indices = 'live'; return; }
+  // ── Direct Yahoo Finance (no proxy) — fastest path ──────────────────────────────
+  async function yahooDirectBulk(endpoint) {
+    try {
+      const r = await fetch(endpoint, {
+        signal: AbortSignal.timeout(6000),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch(e) { return null; }
+  }
 
-  // Source 2: Yahoo Finance v8 chart per missing index — batched 4 at a time
-  const missing = Object.entries(symMap).filter(([sym, key]) => !(LIVE[key] > 0));
-  for (let i = 0; i < missing.length; i += 4) {
-    await Promise.allSettled(missing.slice(i, i+4).map(async ([sym, key]) => {
-      const d = await safeProxiedFetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`
-      );
-      const meta = d?.chart?.result?.[0]?.meta;
-      const p = meta?.regularMarketPrice;
-      const pc = meta?.chartPreviousClose || meta?.previousClose;
-      if (p > 0) { LIVE[key] = p; filled++; }
+  function applyQuoteResults(results) {
+    let n = 0;
+    results.forEach(q => {
+      const key = symMap[q.symbol];
+      if (!key) return;
+      const p = q.regularMarketPrice;
+      const pc = q.regularMarketPreviousClose || q.regularMarketOpen;
+      if (p > 0) { LIVE[key] = p; n++; filled++; }
       if (pc > 0) LIVE.prev[key] = pc;
+    });
+    return n;
+  }
+
+  // Race direct Yahoo v7 (query1 + query2) with proxy in parallel
+  const enc = encodeURIComponent(symbolStr);
+  const [directQ1, directQ2, proxied] = await Promise.allSettled([
+    yahooDirectBulk(
+      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${enc}&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketOpen,symbol`
+    ),
+    yahooDirectBulk(
+      `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${enc}&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketOpen,symbol`
+    ),
+    safeProxiedFetch(
+      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolStr}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`
+    )
+  ]);
+
+  // Use first source that returned usable results
+  for (const res of [directQ1, directQ2, proxied]) {
+    if (res.status !== 'fulfilled' || !res.value) continue;
+    const results = res.value?.quoteResponse?.result || [];
+    if (results.length > 0) {
+      applyQuoteResults(results);
+      if (filled >= 8) { LIVE.apiStatus.indices = 'live'; break; }
+    }
+  }
+
+  // Fill any still-missing indices via direct Yahoo v8 chart (per-symbol, parallel)
+  if (filled < 8) {
+    const missing = Object.entries(symMap).filter(([sym, key]) => !(LIVE[key] > 0));
+    await Promise.allSettled(missing.map(async ([sym, key]) => {
+      // Try query1 and query2 in parallel per symbol
+      const [r1, r2] = await Promise.allSettled([
+        yahooDirectBulk(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`),
+        yahooDirectBulk(`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`),
+      ]);
+      for (const r of [r1, r2]) {
+        if (r.status !== 'fulfilled' || !r.value) continue;
+        const meta = r.value?.chart?.result?.[0]?.meta;
+        const p  = meta?.regularMarketPrice;
+        const pc = meta?.chartPreviousClose || meta?.previousClose;
+        if (p > 0) { LIVE[key] = p; filled++; }
+        if (pc > 0) LIVE.prev[key] = pc;
+        if (p > 0) break; // got it, stop
+      }
     }));
   }
-  if (filled >= 5) { LIVE.apiStatus.indices = 'live'; return; }
 
-  // Source 3: Stooq for key indices still missing
-  const stooqMap = {'sp500':'^spx','nifty50':'^nsei','nikkei':'^nkx','dax':'^dax','ftse100':'^ftx','hangseng':'^hsi','kospi':'^ks11'};
-  const stooqMissing = Object.entries(stooqMap).filter(([key]) => !(LIVE[key] > 0));
-  await Promise.allSettled(stooqMissing.map(async ([key, sym]) => {
-    const d = await safeProxiedFetch(`https://stooq.com/q/l/?s=${sym}&f=sd2t2ohlcv&h&e=json`);
-    const c = parseFloat(d?.symbols?.[0]?.close);
-    if (c > 0) { LIVE[key] = c; filled++; }
-  }));
+  // Last resort: Stooq for any still-missing key indices (via proxy)
+  if (filled < 8) {
+    const stooqMap = {
+      'sp500':'^spx','nifty50':'^nsei','nikkei':'^nkx',
+      'dax':'^dax','ftse100':'^ftx','hangseng':'^hsi','kospi':'^ks11'
+    };
+    await Promise.allSettled(
+      Object.entries(stooqMap)
+        .filter(([key]) => !(LIVE[key] > 0))
+        .map(async ([key, sym]) => {
+          const d = await safeProxiedFetch(`https://stooq.com/q/l/?s=${sym}&f=sd2t2ohlcv&h&e=json`);
+          const c = parseFloat(d?.symbols?.[0]?.close);
+          if (c > 0) { LIVE[key] = c; filled++; }
+        })
+    );
+  }
 
   LIVE.apiStatus.indices = filled > 0 ? 'live' : 'fallback';
 }
@@ -1720,17 +2058,14 @@ async function fetchAllAPIData() {
   let done = 0;
   const tick = () => { done++; loaderProgress(Math.min(8 + done * 18, 95)); };
 
-  // FX must resolve FIRST — metals/India prices depend on the USD→INR rate
-  await fetchFX();
-  loaderSetDone('fx', isLive('fx'));
-  tick();
-
-  // Now run metals (includes ETF fetch), oil, indices, crypto in parallel
+  // Run ALL fetches in parallel — FX has pre-seeded fallback values so metals/oil
+  // can start immediately. deriveIndiaPrices() runs after all complete with live FX.
   await Promise.allSettled([
-    fetchGoldSilver().then(() => { loaderSetDone('metals', isLive('metals')); tick(); }),
-    fetchOil()       .then(() => { loaderSetDone('oil',    isLive('oil'));    tick(); }),
-    fetchIndices()   .then(() => { loaderSetDone('indices',isLive('indices'));tick(); }),
-    fetchCrypto()    .then(() => { loaderSetDone('crypto', isLive('crypto')); tick(); }),
+    fetchFX()        .then(() => { loaderSetDone('fx',      isLive('fx'));      tick(); }),
+    fetchGoldSilver().then(() => { loaderSetDone('metals',  isLive('metals'));  tick(); }),
+    fetchOil()       .then(() => { loaderSetDone('oil',     isLive('oil'));     tick(); }),
+    fetchIndices()   .then(() => { loaderSetDone('indices', isLive('indices')); tick(); }),
+    fetchCrypto()    .then(() => { loaderSetDone('crypto',  isLive('crypto'));  tick(); }),
   ]);
 
   // Derive India MCX/gray/DeFi prices from live LBMA + live FX
@@ -2074,28 +2409,28 @@ function renderOil() {
 // WORLD INDICES
 // ============================================================
 const SP_INDICES = [
-  {key:'sp500',    name:'S&P 500',        countryKey:'United States',  cur:'USD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sp500'},
-  {key:'nifty50',  name:'Nifty 50',       countryKey:'India',          cur:'INR', badge:'badge-india',  chgMag:0.5, cardShow:true, exchangeKey:'nifty50'},
-  {key:'nikkei',   name:'Nikkei 225',     countryKey:'Japan',          cur:'JPY', badge:'badge-japan',  chgMag:0.9, cardShow:true, exchangeKey:'nikkei'},
-  {key:'dax',      name:'DAX',            countryKey:'Germany',        cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'dax'},
-  {key:'cac40',    name:'CAC 40',         countryKey:'France',         cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'cac40'},
-  {key:'ftse100',  name:'FTSE 100',       countryKey:'United Kingdom', cur:'GBP', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'ftse100'},
-  {key:'sse',      name:'Shanghai (SSE)', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:1.0, cardShow:true, exchangeKey:'sse'},
-  {key:'hangseng', name:'Hang Seng',      countryKey:'Hong Kong',      cur:'HKD', badge:'badge-china',  chgMag:1.1, cardShow:true, exchangeKey:'hangseng'},
-  {key:'csi300',   name:'CSI 300',        countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:0.8, cardShow:true, exchangeKey:'csi300'},
-  {key:'euroStoxx',name:'EURO STOXX 50',  countryKey:'Euro Area',      cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'euroStoxx'},
-  {key:'ta125',    name:'TA-125',         countryKey:'Israel',         cur:'ILS', badge:'badge-israel', chgMag:0.9, cardShow:true, exchangeKey:'ta125'},
-  {key:'moex',     name:'MOEX (CFD)',     countryKey:'Russia',         cur:'RUB', badge:'badge-russia', chgMag:1.2, cardShow:true, exchangeKey:'moex'},
-  {key:'kospi',    name:'Kospi',          countryKey:'South Korea',    cur:'KRW', badge:'badge-korea',  chgMag:0.9, cardShow:true, exchangeKey:'kospi'},
-  {key:'panArab',  name:'S&P Pan Arab',   countryKey:'Pan Arab',       cur:'USD', badge:'badge-world',  chgMag:0.7, cardShow:true, exchangeKey:'panArab'},
-  {key:'sti',      name:'Straits Times (STI)', countryKey:'Singapore', cur:'SGD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sti'},
-  {key:'taiex',    name:'TAIEX',          countryKey:'Taiwan',         cur:'TWD', badge:'badge-world',  chgMag:0.8, cardShow:true, exchangeKey:'taiex'},
+  {key:'sp500',    name:'S&P 500',        flag:'🇺🇸', countryKey:'United States',  cur:'USD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sp500'},
+  {key:'nifty50',  name:'Nifty 50',       flag:'🇮🇳', countryKey:'India',          cur:'INR', badge:'badge-india',  chgMag:0.5, cardShow:true, exchangeKey:'nifty50'},
+  {key:'nikkei',   name:'Nikkei 225',     flag:'🇯🇵', countryKey:'Japan',          cur:'JPY', badge:'badge-japan',  chgMag:0.9, cardShow:true, exchangeKey:'nikkei'},
+  {key:'dax',      name:'DAX',            flag:'🇩🇪', countryKey:'Germany',        cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'dax'},
+  {key:'cac40',    name:'CAC 40',         flag:'🇫🇷', countryKey:'France',         cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'cac40'},
+  {key:'ftse100',  name:'FTSE 100',       flag:'🇬🇧', countryKey:'United Kingdom', cur:'GBP', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'ftse100'},
+  {key:'sse',      name:'Shanghai (SSE)', flag:'🇨🇳', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:1.0, cardShow:true, exchangeKey:'sse'},
+  {key:'hangseng', name:'Hang Seng',      flag:'🇭🇰', countryKey:'Hong Kong',      cur:'HKD', badge:'badge-china',  chgMag:1.1, cardShow:true, exchangeKey:'hangseng'},
+  {key:'csi300',   name:'CSI 300',        flag:'🇨🇳', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:0.8, cardShow:true, exchangeKey:'csi300'},
+  {key:'euroStoxx',name:'EURO STOXX 50',  flag:'🇪🇺', countryKey:'Euro Area',      cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'euroStoxx'},
+  {key:'ta125',    name:'TA-125',         flag:'🇮🇱', countryKey:'Israel',         cur:'ILS', badge:'badge-israel', chgMag:0.9, cardShow:true, exchangeKey:'ta125'},
+  {key:'moex',     name:'MOEX (CFD)',     flag:'🇷🇺', countryKey:'Russia',         cur:'RUB', badge:'badge-russia', chgMag:1.2, cardShow:true, exchangeKey:'moex'},
+  {key:'kospi',    name:'Kospi',          flag:'🇰🇷', countryKey:'South Korea',    cur:'KRW', badge:'badge-korea',  chgMag:0.9, cardShow:true, exchangeKey:'kospi'},
+  {key:'panArab',  name:'S&P Pan Arab',   flag:'🌍', countryKey:'Pan Arab',       cur:'USD', badge:'badge-world',  chgMag:0.7, cardShow:true, exchangeKey:'panArab'},
+  {key:'sti',      name:'Straits Times (STI)', flag:'🇸🇬', countryKey:'Singapore', cur:'SGD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sti'},
+  {key:'taiex',    name:'TAIEX',          flag:'🇹🇼', countryKey:'Taiwan',         cur:'TWD', badge:'badge-world',  chgMag:0.8, cardShow:true, exchangeKey:'taiex'},
 ];
 
 function renderSP() {
   const indices = SP_INDICES.map(idx => ({
     ...idx,
-    country: t('country_'+idx.countryKey) || idx.countryKey,
+    country: (idx.flag ? idx.flag + ' ' : '') + (t('country_'+idx.countryKey) || idx.countryKey),
     native: jitter(LIVE[idx.key] || idx.fallback || 1000, 0.001),
     chg: chgPct(LIVE[idx.key], LIVE.prev[idx.key], idx.chgMag)
   }));
@@ -2252,6 +2587,11 @@ function renderCrypto() {
 // CHARTS
 // ============================================================
 function buildChart(canvasId, color, currentVal, key, label) {
+  // If Chart.js hasn't loaded yet (async), retry after a short delay
+  if (typeof Chart === 'undefined') {
+    setTimeout(() => buildChart(canvasId, color, currentVal, key, label), 150);
+    return;
+  }
   const ctx = document.getElementById(canvasId);
   if (!ctx) return;
   if (charts[key]) { try{charts[key].destroy()}catch(e){} }
@@ -2337,10 +2677,32 @@ function switchTab(tab) {
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('panel-'+tab).classList.add('active');
   activeTab=tab;
+  // Lazy render: build this tab if it hasn't been rendered yet
+  if (!_tabRendered[tab]) { renderTab(tab); }
 }
 
+// Track which tabs have been rendered
+const _tabRendered = {gold:false, silver:false, oil:false, sp:false, crypto:false};
 function renderAll() {
-  renderGold(); renderSilver(); renderOil(); renderSP(); renderCrypto();
+  // Always render the active tab
+  renderTab(activeTab);
+  // Defer rendering of non-active tabs to avoid blocking
+  ['gold','silver','oil','sp','crypto'].filter(t=>t!==activeTab).forEach(tab => {
+    if (!_tabRendered[tab]) {
+      // Mark as not rendered so they get built on first switch
+      _tabRendered[tab] = false;
+    } else {
+      renderTab(tab); // re-render already-visited tabs
+    }
+  });
+}
+function renderTab(tab) {
+  _tabRendered[tab] = true;
+  if (tab==='gold') renderGold();
+  else if (tab==='silver') renderSilver();
+  else if (tab==='oil') renderOil();
+  else if (tab==='sp') renderSP();
+  else if (tab==='crypto') renderCrypto();
 }
 
 // ============================================================
@@ -2376,7 +2738,52 @@ document.getElementById('currencySelect').addEventListener('change',function(){
   selectedCurrency=this.value; renderAll();
 });
 
+// Theme Toggle
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('gmpt_theme', next);
+  const themeBtn = document.getElementById('themeToggle');
+  if(themeBtn) themeBtn.textContent = next === 'light' ? '☀️' : '🌙';
+  
+  // Update chart defaults to match theme
+  Chart.defaults.color = next === 'light' ? '#5A6380' : '#8890A4';
+  Chart.defaults.borderColor = next === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+  
+  // Re-render charts
+  if (chartState.gold.chart) chartState.gold.chart.update();
+  if (chartState.silver.chart) chartState.silver.chart.update();
+  if (chartState.oil.chart) chartState.oil.chart.update();
+  if (chartState.sp.chart) chartState.sp.chart.update();
+  if (chartState.crypto.chart) chartState.crypto.chart.update();
+}
+
+// Load saved theme
+try {
+  const savedTheme = localStorage.getItem('gmpt_theme');
+  if (savedTheme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    const themeBtn = document.getElementById('themeToggle');
+    if(themeBtn) themeBtn.textContent = '☀️';
+    Chart.defaults.color = '#5A6380';
+    Chart.defaults.borderColor = 'rgba(0,0,0,0.05)';
+  }
+} catch(e) {}
+
+// Clear stale cached oil API responses so we always fetch fresh oil prices.
+// (Oil prices can shift significantly; we never want users to see a cached wrong price.)
+try {
+  const staleOilUrls = ['xtiusd','xbrusd','CL=F','BZ=F','cl.f','bz.f'];
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('gmpt_pf_') && staleOilUrls.some(u => k.includes(u))) {
+      localStorage.removeItem(k);
+    }
+  });
+} catch(e) {}
+
 fetchAllData();
+
 </script>
 <!-- ===== DONATE MODAL ===== -->
 <div class="donate-overlay" id="donateOverlay" onclick="closeDonateOutside(event)">
