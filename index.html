@@ -1045,6 +1045,9 @@ const LIVE = {
   goldUSDoz:    3350.00,
   // Silver: LBMA spot per troy oz in USD (~$33.50/oz as of May 2026)
   silverUSDoz:  33.50,
+  // NSE BEES Fallbacks (prices in INR per unit)
+  goldBeesINR:  130.51,
+  silverBeesINR: 256.03,
   // Crypto USD prices (May 2026 approximate)
   btcUSD:       108000,
   ethUSD:       2550,
@@ -2252,8 +2255,8 @@ function renderSilver() {
   const defiPG    = fromINR(defiINRg);
   const defiUSDg  = defiINRg / LIVE.fx.USD;
 
-  const beesPG    = fromINR(jitter(LIVE.silverBeesINR, 0.002));
-  const beesINRg  = LIVE.silverBeesINR;
+  const beesINRg  = LIVE.silverBeesINR || 256.03;
+  const beesPG    = fromINR(jitter(beesINRg, 0.002));
 
   const chinaSilverINRg = jitter(LIVE.silverChinainr, 0.002);
   const chinaSilverPG   = fromINR(chinaSilverINRg);
