@@ -2412,31 +2412,34 @@ function renderOil() {
 // WORLD INDICES
 // ============================================================
 const SP_INDICES = [
-  {key:'sp500',    name:'S&P 500',        flag:'🇺🇸', countryKey:'United States',  cur:'USD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sp500'},
-  {key:'nifty50',  name:'Nifty 50',       flag:'🇮🇳', countryKey:'India',          cur:'INR', badge:'badge-india',  chgMag:0.5, cardShow:true, exchangeKey:'nifty50'},
-  {key:'nikkei',   name:'Nikkei 225',     flag:'🇯🇵', countryKey:'Japan',          cur:'JPY', badge:'badge-japan',  chgMag:0.9, cardShow:true, exchangeKey:'nikkei'},
-  {key:'dax',      name:'DAX',            flag:'🇩🇪', countryKey:'Germany',        cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'dax'},
-  {key:'cac40',    name:'CAC 40',         flag:'🇫🇷', countryKey:'France',         cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'cac40'},
-  {key:'ftse100',  name:'FTSE 100',       flag:'🇬🇧', countryKey:'United Kingdom', cur:'GBP', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'ftse100'},
-  {key:'sse',      name:'Shanghai (SSE)', flag:'🇨🇳', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:1.0, cardShow:true, exchangeKey:'sse'},
-  {key:'hangseng', name:'Hang Seng',      flag:'🇭🇰', countryKey:'Hong Kong',      cur:'HKD', badge:'badge-china',  chgMag:1.1, cardShow:true, exchangeKey:'hangseng'},
-  {key:'csi300',   name:'CSI 300',        flag:'🇨🇳', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:0.8, cardShow:true, exchangeKey:'csi300'},
-  {key:'euroStoxx',name:'EURO STOXX 50',  flag:'🇪🇺', countryKey:'Euro Area',      cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'euroStoxx'},
-  {key:'ta125',    name:'TA-125',         flag:'🇮🇱', countryKey:'Israel',         cur:'ILS', badge:'badge-israel', chgMag:0.9, cardShow:true, exchangeKey:'ta125'},
-  {key:'moex',     name:'MOEX (CFD)',     flag:'🇷🇺', countryKey:'Russia',         cur:'RUB', badge:'badge-russia', chgMag:1.2, cardShow:true, exchangeKey:'moex'},
-  {key:'kospi',    name:'Kospi',          flag:'🇰🇷', countryKey:'South Korea',    cur:'KRW', badge:'badge-korea',  chgMag:0.9, cardShow:true, exchangeKey:'kospi'},
-  {key:'panArab',  name:'S&P Pan Arab',   flag:'🌍', countryKey:'Pan Arab',       cur:'USD', badge:'badge-world',  chgMag:0.7, cardShow:true, exchangeKey:'panArab'},
-  {key:'sti',      name:'Straits Times (STI)', flag:'🇸🇬', countryKey:'Singapore', cur:'SGD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sti'},
-  {key:'taiex',    name:'TAIEX',          flag:'🇹🇼', countryKey:'Taiwan',         cur:'TWD', badge:'badge-world',  chgMag:0.8, cardShow:true, exchangeKey:'taiex'},
+  {key:'sp500',    name:'S&P 500',        flag:'us', countryKey:'United States',  cur:'USD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sp500'},
+  {key:'nifty50',  name:'Nifty 50',       flag:'in', countryKey:'India',          cur:'INR', badge:'badge-india',  chgMag:0.5, cardShow:true, exchangeKey:'nifty50'},
+  {key:'nikkei',   name:'Nikkei 225',     flag:'jp', countryKey:'Japan',          cur:'JPY', badge:'badge-japan',  chgMag:0.9, cardShow:true, exchangeKey:'nikkei'},
+  {key:'dax',      name:'DAX',            flag:'de', countryKey:'Germany',        cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'dax'},
+  {key:'cac40',    name:'CAC 40',         flag:'fr', countryKey:'France',         cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'cac40'},
+  {key:'ftse100',  name:'FTSE 100',       flag:'gb', countryKey:'United Kingdom', cur:'GBP', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'ftse100'},
+  {key:'sse',      name:'Shanghai (SSE)', flag:'cn', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:1.0, cardShow:true, exchangeKey:'sse'},
+  {key:'hangseng', name:'Hang Seng',      flag:'hk', countryKey:'Hong Kong',      cur:'HKD', badge:'badge-china',  chgMag:1.1, cardShow:true, exchangeKey:'hangseng'},
+  {key:'csi300',   name:'CSI 300',        flag:'cn', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:0.8, cardShow:true, exchangeKey:'csi300'},
+  {key:'euroStoxx',name:'EURO STOXX 50',  flag:'eu', countryKey:'Euro Area',      cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'euroStoxx'},
+  {key:'ta125',    name:'TA-125',         flag:'il', countryKey:'Israel',         cur:'ILS', badge:'badge-israel', chgMag:0.9, cardShow:true, exchangeKey:'ta125'},
+  {key:'moex',     name:'MOEX (CFD)',     flag:'ru', countryKey:'Russia',         cur:'RUB', badge:'badge-russia', chgMag:1.2, cardShow:true, exchangeKey:'moex'},
+  {key:'kospi',    name:'Kospi',          flag:'kr', countryKey:'South Korea',    cur:'KRW', badge:'badge-korea',  chgMag:0.9, cardShow:true, exchangeKey:'kospi'},
+  {key:'panArab',  name:'S&P Pan Arab',   flag:'sa', countryKey:'Pan Arab',       cur:'USD', badge:'badge-world',  chgMag:0.7, cardShow:true, exchangeKey:'panArab'},
+  {key:'sti',      name:'Straits Times (STI)', flag:'sg', countryKey:'Singapore', cur:'SGD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sti'},
+  {key:'taiex',    name:'TAIEX',          flag:'tw', countryKey:'Taiwan',         cur:'TWD', badge:'badge-world',  chgMag:0.8, cardShow:true, exchangeKey:'taiex'},
 ];
 
 function renderSP() {
-  const indices = SP_INDICES.map(idx => ({
-    ...idx,
-    country: (idx.flag ? idx.flag + ' ' : '') + (t('country_'+idx.countryKey) || idx.countryKey),
-    native: jitter(LIVE[idx.key] || idx.fallback || 1000, 0.001),
-    chg: chgPct(LIVE[idx.key], LIVE.prev[idx.key], idx.chgMag)
-  }));
+  const indices = SP_INDICES.map(idx => {
+    const flagHtml = idx.flag ? `<img src="https://flagcdn.com/w20/${idx.flag}.png" srcset="https://flagcdn.com/w40/${idx.flag}.png 2x" width="16" alt="${idx.flag}" style="vertical-align:middle;margin-right:5px;border-radius:2px;box-shadow:0 0 2px rgba(0,0,0,0.3)">` : '';
+    return {
+      ...idx,
+      country: flagHtml + (t('country_'+idx.countryKey) || idx.countryKey),
+      native: jitter(LIVE[idx.key] || idx.fallback || 1000, 0.001),
+      chg: chgPct(LIVE[idx.key], LIVE.prev[idx.key], idx.chgMag)
+    };
+  });
 
   function nativeToSelected(val, cur) {
     return fromINR(val * (LIVE.fx[cur] || 1));
