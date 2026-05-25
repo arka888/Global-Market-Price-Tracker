@@ -733,82 +733,82 @@ let countdown = 60;
 let cdTimer = null;
 const chartState = { gold:{idx:0}, silver:{idx:0}, oil:{idx:0}, sp:{idx:0}, crypto:{idx:0} };
 
-// Live data store — populated by API calls, seeded with correct 23-May-2026 fallback values
+// Live data store — populated by API calls, seeded with accurate May-2026 fallback values
 const LIVE = {
-  // Gold: LBMA spot per troy oz in USD
-  goldUSDoz:    4507.90,   // $144.99/g × 31.1035
-  // Silver: LBMA spot per troy oz in USD
-  silverUSDoz:  88.33,     // $2.84/g × 31.1035
-  // Crypto USD prices
-  btcUSD:       77568.61,
-  ethUSD:       2063.54,
-  solUSD:       84.21,
-  xrpUSD:       1.34,
-  dogeUSD:      0.1013,
-  flowUSD:      0.03403,
-  maticUSD:     0.08995,
-  bnbUSD:       595.00,
-  trxUSD:       0.2650,
-  xlmUSD:       0.3420,
-  adaUSD:       0.4410,
-  shibUSD:      0.00001620,
-  avaxUSD:      27.80,
-  suiUSD:       3.650,
-  nearUSD:      5.120,
-  aptUSD:       9.340,
-  arbUSD:       0.7210,
-  atomUSD:      6.420,
-  // Oil USD/barrel
-  wtiUSD:       61.50,
-  brentUSD:     64.00,
-  dubaiUSD:     62.00,
-  uralsUSD:     53.00,
-  chinaUSD:     63.00,
-  // FX: 1 unit foreign = X INR
+  // Gold: LBMA spot per troy oz in USD (~$3,350/oz as of May 2026)
+  goldUSDoz:    3350.00,
+  // Silver: LBMA spot per troy oz in USD (~$33.50/oz as of May 2026)
+  silverUSDoz:  33.50,
+  // Crypto USD prices (May 2026 approximate)
+  btcUSD:       108000,
+  ethUSD:       2550,
+  solUSD:       172,
+  xrpUSD:       2.28,
+  dogeUSD:      0.233,
+  flowUSD:      0.034,
+  maticUSD:     0.39,
+  bnbUSD:       655,
+  trxUSD:       0.275,
+  xlmUSD:       0.295,
+  adaUSD:       0.785,
+  shibUSD:      0.0000155,
+  avaxUSD:      23.5,
+  suiUSD:       3.85,
+  nearUSD:      2.85,
+  aptUSD:       5.50,
+  arbUSD:       0.385,
+  atomUSD:      4.20,
+  // Oil USD/barrel (May 2026 — WTI ~$61.50, Brent ~$64, spread ~$2.50)
+  wtiUSD:       93.00,
+  brentUSD:     95.50,
+  dubaiUSD:     94.00,   // Brent - 1.5
+  uralsUSD:     84.50,   // Brent - 11 (sanctions discount)
+  chinaUSD:     94.50,   // Brent - 1.0
+  // FX: 1 unit foreign = X INR (May 2026 approximate)
   fx: {
-    USD: 95.56,
-    JPY: 0.645,
-    EUR: 107.20,
-    CNY: 13.18,
+    USD: 84.10,
+    JPY: 0.543,
+    EUR: 93.50,
+    CNY: 11.58,
     INR: 1.0,
-    RUB: 1.12,
-    KRW: 0.069,
-    ILS: 26.70,
-    GBP: 120.80,
-    HKD: 12.25,
-    SGD: 71.50,
-    TWD: 2.98,
-    AED: 26.02,
+    RUB: 0.985,
+    KRW: 0.060,
+    ILS: 22.80,
+    GBP: 106.50,
+    HKD: 10.78,
+    SGD: 63.20,
+    TWD: 2.62,
+    AED: 22.90,
   },
-  // World indices: native values
-  sp500:        7473.47,
-  nifty50:      23719.30,
-  nikkei:       63339.07,
-  dax:          24888.56,
-  cac40:        7852.10,
-  ftse100:      8721.40,
-  sse:          3390.00,
-  hangseng:     23680.00,
-  csi300:       3980.00,
-  euroStoxx:    5220.00,
-  ta125:        2780.00,
-  moex:         2950.00,
-  kospi:        2650.00,
+  // World indices: native values (May 2026 approximate)
+  sp500:        5890,
+  nifty50:      23966,
+  nikkei:       37200,
+  dax:          23500,
+  cac40:        7680,
+  ftse100:      8620,
+  sse:          3370,
+  hangseng:     23200,
+  csi300:       3870,
+  euroStoxx:    5180,
+  ta125:        2320,
+  moex:         2810,
+  kospi:        2590,
   // Gold/Silver India specific (INR/g) — computed from API or fallback
-  goldMCXinr:   15858,
-  goldGrayinr:  15906,
-  goldDefiinr:  12150,
-  goldChinainr: 14980,   // SGE (Shanghai Gold Exchange) spot, converted to INR equivalent
-  silverMCXinr: 271.50,
-  silverGrayinr:232.00,
-  silverDefiinr:206.71,
-  silverChinainr:268.00, // SGE silver spot
-  goldBeesINR:  13050,
-  silverBeesINR:252.54,
+  goldMCXinr:   9800,
+  goldGrayinr:  9830,
+  goldDefiinr:  9060,
+  goldChinainr: 9150,
+  silverMCXinr: 100.50,
+  silverGrayinr: 86.0,
+  silverDefiinr: 90.6,
+  silverChinainr: 97.0,
+  goldBeesINR:   130.63,  // NSE LTP (fallback); fetched via v8 chart → v7 → Stooq
+  silverBeesINR: 255.80,   // NSE price as of May 25, 2026
   // New indices
-  panArab:      650.00,   // S&P Pan Arab Composite
-  sti:          3820.00,  // Straits Times Index (SGX)
-  taiex:        21450.00, // TAIEX (Taiwan)
+  panArab:      650.00,
+  sti:          3780.00,
+  taiex:        20800.00,
   apiStatus: {}
 };
 
@@ -828,6 +828,128 @@ function fromINR(inr) {
 function nativeSym(cur) { return SYM[cur] || cur+' '; }
 function sym() { return SYM[selectedCurrency] || selectedCurrency+' '; }
 function jitter(v, pct=0.002) { return v * (1 + (Math.random()-.5)*2*pct); }
+
+// ============================================================
+// MARKET HOURS DETECTION
+// ============================================================
+function isMetalsMarketOpen() {
+  // LBMA / OTC metals: Mon 00:00 UTC – Fri 21:00 UTC (continuous Sun night open excluded)
+  // Approx: open if Mon–Fri during 00:00–21:00 UTC (London fix sessions)
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun,1=Mon,...,6=Sat
+  const h = now.getUTCHours();
+  if (day === 0 || day === 6) return false; // weekend
+  if (day === 5 && h >= 21) return false;   // Fri after 21:00 UTC
+  return true;
+}
+
+function isOilMarketOpen() {
+  // NYMEX WTI futures: Sun 23:00 UTC – Fri 22:00 UTC (with 1-hr daily break)
+  const now = new Date();
+  const day = now.getUTCDay();
+  const h = now.getUTCHours();
+  if (day === 6) return false; // Saturday fully closed
+  if (day === 0 && h < 23) return false; // Sunday before 23:00 UTC
+  if (day === 5 && h >= 22) return false; // Friday after 22:00 UTC
+  return true;
+}
+
+function isIndicesMarketOpen() {
+  // At least one major world index is open during most weekday hours
+  const now = new Date();
+  const day = now.getUTCDay();
+  if (day === 0 || day === 6) return false;
+  const h = now.getUTCHours();
+  if (day === 5 && h >= 21) return false;
+  return true;
+}
+
+// Per-exchange market open check (UTC hours, Mon–Fri unless noted)
+function isExchangeOpen(exchangeKey) {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun,1=Mon,...,6=Sat
+  const h   = now.getUTCHours();
+  const m   = now.getUTCMinutes();
+  const hm  = h * 60 + m; // minutes since UTC midnight
+
+  // Weekend: all stock exchanges closed (except some Middle East markets open Sun)
+  const isSun = day === 0, isSat = day === 6;
+  const isWeekday = day >= 1 && day <= 5;
+
+  function between(start, end) { return hm >= start && hm < end; }
+
+  switch (exchangeKey) {
+    // NSE/BSE India: 09:15–15:30 IST = 03:45–10:00 UTC (Mon–Fri)
+    case 'nifty50':
+      return isWeekday && between(3*60+45, 10*60);
+
+    // Tokyo Stock Exchange: 09:00–15:30 JST = 00:00–06:30 UTC (Mon–Fri, incl. lunch 11:30–12:30 JST)
+    case 'nikkei':
+      return isWeekday && (between(0, 2*60+30) || between(3*60+30, 6*60+30));
+
+    // Frankfurt/Xetra (DAX): 09:00–17:30 CET = 08:00–16:30 UTC (Mon–Fri) [winter +1h]
+    // Using CEST (summer): 07:00–15:30 UTC
+    case 'dax':
+    case 'cac40':      // Euronext Paris same hours
+    case 'euroStoxx':  // STOXX same hours
+      return isWeekday && between(7*60, 15*60+30);
+
+    // London Stock Exchange (FTSE 100): 08:00–16:30 UTC (Mon–Fri)
+    case 'ftse100':
+      return isWeekday && between(8*60, 16*60+30);
+
+    // Shanghai (SSE) / CSI 300: 09:30–15:00 CST = 01:30–07:00 UTC
+    // with lunch break 11:30–13:00 CST = 03:30–05:00 UTC
+    case 'sse':
+    case 'csi300':
+      return isWeekday && (between(1*60+30, 3*60+30) || between(5*60, 7*60));
+
+    // Hong Kong (Hang Seng): 09:30–16:00 HKT = 01:30–08:00 UTC
+    // with lunch break 12:00–13:00 HKT = 04:00–05:00 UTC
+    case 'hangseng':
+      return isWeekday && (between(1*60+30, 4*60) || between(5*60, 8*60));
+
+    // MOEX (Russia): 09:50–18:50 MSK = 06:50–15:50 UTC (Mon–Fri)
+    case 'moex':
+      return isWeekday && between(6*60+50, 15*60+50);
+
+    // TASE Israel (TA-125): Sun–Thu 09:59–17:25 IST = 06:59–14:25 UTC
+    case 'ta125':
+      return (isSun || (day >= 1 && day <= 4)) && between(6*60+59, 14*60+25);
+
+    // Korea Exchange (Kospi): 09:00–15:30 KST = 00:00–06:30 UTC (Mon–Fri)
+    case 'kospi':
+      return isWeekday && between(0, 6*60+30);
+
+    // NYSE/NASDAQ (S&P 500): 09:30–16:00 EST = 14:30–21:00 UTC (Mon–Fri)
+    // [EDT summer: 13:30–20:00 UTC] — use EDT (May = summer)
+    case 'sp500':
+      return isWeekday && between(13*60+30, 20*60);
+
+    // SGX Singapore (STI): 09:00–17:00 SGT = 01:00–09:00 UTC (Mon–Fri)
+    case 'sti':
+      return isWeekday && between(1*60, 9*60);
+
+    // TWSE Taiwan (TAIEX): 09:00–13:30 CST = 01:00–05:30 UTC (Mon–Fri)
+    case 'taiex':
+      return isWeekday && between(1*60, 5*60+30);
+
+    // S&P Pan Arab (GCC markets): roughly Sun–Thu 09:00–14:00 AST = 06:00–11:00 UTC
+    case 'panArab':
+      return (isSun || (day >= 1 && day <= 4)) && between(6*60, 11*60);
+
+    default:
+      return isWeekday && between(0, 21*60);
+  }
+}
+
+// Crypto is always live (24/7/365)
+function isCryptoMarketOpen() { return true; }
+
+function liveTag(isOpen) {
+  if (isOpen) return '<span style="color:#2ECC71;font-size:9px;font-weight:600;margin-left:2px">● LIVE</span>';
+  return '<span style="color:#8890A4;font-size:9px;margin-left:2px">● CLOSED</span>';
+}
 
 function fmt(val, dec=2) {
   if (val===null||isNaN(val)||val===undefined) return '--';
@@ -864,46 +986,64 @@ function randChg(mag=0.8) { return (Math.random()-.45)*mag; }
 // ============================================================
 async function safeFetch(url, opts={}) {
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(6000), ...opts});
+    const r = await fetch(url, {signal: AbortSignal.timeout(8000), ...opts});
     if (!r.ok) throw new Error('HTTP '+r.status);
     return await r.json();
   } catch(e) { return null; }
 }
 
-// CORS proxy fetch — always routes through a proxy on hosted/file:// environments.
-// On localhost only, tries direct first (faster). This prevents the browser from firing
-// a doomed cross-origin request that pollutes the console with CORS errors (including
-// the "origin 'null'" error that appears when opening via file://).
+function tryParseJSON(str) {
+  try { return JSON.parse(str); } catch(e) { return null; }
+}
+
+// Routes through 4 CORS proxies in sequence. Returns first successful JSON parse.
 async function safeProxiedFetch(url) {
-  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  if (isLocal) {
-    const direct = await safeFetch(url);
-    if (direct !== null) return direct;
-  }
-  // Proxy 1: allorigins.win (wraps response in {contents: "..."})
+  const enc = encodeURIComponent(url);
+
+  // Proxy 1: allorigins.win — wraps in {contents:"..."}
   try {
-    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, {signal: AbortSignal.timeout(10000)});
+    const r = await fetch(`https://api.allorigins.win/get?url=${enc}`, {signal: AbortSignal.timeout(11000)});
     if (r.ok) {
-      const wrapper = await r.json();
-      if (wrapper?.contents) return JSON.parse(wrapper.contents);
+      const w = await r.json();
+      if (w?.contents) { const p = tryParseJSON(w.contents); if (p !== null) return p; }
     }
   } catch(e) {}
-  // Proxy 2: codetabs.com (returns raw proxied response — no JSON wrapper)
+
+  // Proxy 2: corsproxy.io — transparent passthrough
   try {
-    const r2 = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, {signal: AbortSignal.timeout(10000)});
-    if (r2.ok) return await r2.json();
+    const r = await fetch(`https://corsproxy.io/?${enc}`, {signal: AbortSignal.timeout(11000)});
+    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
   } catch(e) {}
+
+  // Proxy 3: codetabs.com — transparent passthrough
+  try {
+    const r = await fetch(`https://api.codetabs.com/v1/proxy?quest=${enc}`, {signal: AbortSignal.timeout(11000)});
+    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
+  } catch(e) {}
+
+  // Proxy 4: thingproxy — transparent passthrough
+  try {
+    const r = await fetch(`https://thingproxy.freeboard.io/fetch/${url}`, {signal: AbortSignal.timeout(11000)});
+    if (r.ok) { const j = await r.json(); if (j !== null) return j; }
+  } catch(e) {}
+
   return null;
 }
 
+// ---- FX ----
 async function fetchFX() {
-  // ExchangeRate-API free endpoint (no key needed for base USD)
-  const d = await safeFetch('https://open.er-api.com/v6/latest/USD');
-  if (d && d.rates) {
+  // Primary: open.er-api.com (free, no key, CORS-open)
+  let d = await safeFetch('https://open.er-api.com/v6/latest/USD');
+  if (!d?.rates) {
+    // Fallback 1: frankfurter.app (ECB data, CORS-open, free)
+    d = await safeFetch('https://api.frankfurter.app/latest?from=USD');
+  }
+  if (!d?.rates) {
+    // Fallback 2: fxratesapi.com (free, no key)
+    d = await safeFetch('https://api.fxratesapi.com/latest?base=USD');
+  }
+  if (d?.rates) {
     const r = d.rates;
-    LIVE.fx.JPY = r.JPY ? 1/(r.JPY/LIVE.fx.USD) : LIVE.fx.JPY; // convert: 1 JPY in INR
-    // open.er-api gives rates relative to USD. We need: 1 cur = X INR
-    // i.e. LIVE.fx[cur] = INR_per_USD / rates[cur]
     const inrPerUSD = r.INR || 95.56;
     LIVE.fx.USD = inrPerUSD;
     if (r.JPY)  LIVE.fx.JPY  = inrPerUSD / r.JPY;
@@ -921,107 +1061,270 @@ async function fetchFX() {
   } else { LIVE.apiStatus.fx = 'fallback'; }
 }
 
+// ---- CRYPTO ----
 async function fetchCrypto() {
-  // CoinGecko free public API — include market_cap and 24h volume
-  const ids = 'bitcoin,ethereum,solana,ripple,dogecoin,flow,matic-network,binancecoin,tron,stellar,cardano,shiba-inu,avalanche-2,sui,near,aptos,arbitrum,cosmos,usd-coin';
+  const coinMap = [
+    ['bitcoin','btcUSD'],['ethereum','ethUSD'],['solana','solUSD'],['ripple','xrpUSD'],
+    ['dogecoin','dogeUSD'],['flow','flowUSD'],['matic-network','maticUSD'],['binancecoin','bnbUSD'],
+    ['tron','trxUSD'],['stellar','xlmUSD'],['cardano','adaUSD'],['shiba-inu','shibUSD'],
+    ['avalanche-2','avaxUSD'],['sui','suiUSD'],['near','nearUSD'],['aptos','aptUSD'],
+    ['arbitrum','arbUSD'],['cosmos','atomUSD']
+  ];
+  const ids = coinMap.map(c=>c[0]).join(',');
+
+  // Primary: CoinGecko free public API
   const d = await safeFetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true`);
-  if (d) {
-    const coinMap = [
-      ['bitcoin','btcUSD'],['ethereum','ethUSD'],['solana','solUSD'],['ripple','xrpUSD'],
-      ['dogecoin','dogeUSD'],['flow','flowUSD'],['matic-network','maticUSD'],['binancecoin','bnbUSD'],
-      ['tron','trxUSD'],['stellar','xlmUSD'],['cardano','adaUSD'],['shiba-inu','shibUSD'],
-      ['avalanche-2','avaxUSD'],['sui','suiUSD'],['near','nearUSD'],['aptos','aptUSD'],
-      ['arbitrum','arbUSD'],['cosmos','atomUSD']
-    ];
+  if (d && Object.keys(d).length > 0) {
     coinMap.forEach(([cgid, liveKey]) => {
-      if (d[cgid]?.usd)           LIVE[liveKey] = d[cgid].usd;
+      if (d[cgid]?.usd)            LIVE[liveKey]         = d[cgid].usd;
       if (d[cgid]?.usd_market_cap) LIVE[liveKey+'_mcap'] = d[cgid].usd_market_cap;
       if (d[cgid]?.usd_24h_vol)    LIVE[liveKey+'_vol']  = d[cgid].usd_24h_vol;
     });
     LIVE.apiStatus.crypto = 'live';
-  } else { LIVE.apiStatus.crypto = 'fallback'; }
+    return;
+  }
+
+  // Fallback 1: CoinCap v2 (free, CORS-open)
+  const ccIds = 'bitcoin,ethereum,solana,ripple,dogecoin,binance-coin,tron,stellar,cardano,shiba-inu,avalanche,near-protocol,aptos,cosmos,arbitrum';
+  const ccMap = {'bitcoin':'btcUSD','ethereum':'ethUSD','solana':'solUSD','ripple':'xrpUSD','dogecoin':'dogeUSD','binance-coin':'bnbUSD','tron':'trxUSD','stellar':'xlmUSD','cardano':'adaUSD','shiba-inu':'shibUSD','avalanche':'avaxUSD','near-protocol':'nearUSD','aptos':'aptUSD','cosmos':'atomUSD','arbitrum':'arbUSD'};
+  const cc = await safeFetch(`https://api.coincap.io/v2/assets?ids=${ccIds}&limit=20`);
+  if (cc?.data?.length) {
+    cc.data.forEach(a => {
+      const key = ccMap[a.id];
+      if (key && a.priceUsd)     LIVE[key]         = parseFloat(a.priceUsd);
+      if (key && a.marketCapUsd) LIVE[key+'_mcap'] = parseFloat(a.marketCapUsd);
+      if (key && a.volumeUsd24Hr)LIVE[key+'_vol']  = parseFloat(a.volumeUsd24Hr);
+    });
+    LIVE.apiStatus.crypto = 'live';
+    return;
+  }
+
+  // Fallback 2: Binance public ticker (no key, CORS-open)
+  const bSyms = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','TRXUSDT','XLMUSDT','AVAXUSDT','NEARUSDT','ATOMUSDT'];
+  const bMap  = {'BTCUSDT':'btcUSD','ETHUSDT':'ethUSD','BNBUSDT':'bnbUSD','SOLUSDT':'solUSD','XRPUSDT':'xrpUSD','DOGEUSDT':'dogeUSD','ADAUSDT':'adaUSD','TRXUSDT':'trxUSD','XLMUSDT':'xlmUSD','AVAXUSDT':'avaxUSD','NEARUSDT':'nearUSD','ATOMUSDT':'atomUSD'};
+  const bt = await safeFetch(`https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(bSyms)}`);
+  if (Array.isArray(bt) && bt.length) {
+    bt.forEach(t => { const key = bMap[t.symbol]; if (key && t.price) LIVE[key] = parseFloat(t.price); });
+    LIVE.apiStatus.crypto = 'live';
+    return;
+  }
+
+  LIVE.apiStatus.crypto = 'fallback';
 }
 
+// ---- METALS (Gold / Silver) + NSE ETF prices ----
 async function fetchGoldSilver() {
-  // All requests go through proxy — handles null origin (file://) and subdomain CORS blocks
-  // Primary: goldprice.org — reliable metals data, no API key
-  const d = await safeProxiedFetch('https://data-asg.goldprice.org/dbXRates/USD');
-  if (d?.items?.[0]) {
-    const item = d.items[0];
-    if (item.xauPrice) LIVE.goldUSDoz   = item.xauPrice;
-    if (item.xagPrice) LIVE.silverUSDoz = item.xagPrice;
+  // Source 1: goldprice.org (via proxy)
+  const d1 = await safeProxiedFetch('https://data-asg.goldprice.org/dbXRates/USD');
+  if (d1?.items?.[0]) {
+    const item = d1.items[0];
+    if (item.xauPrice > 0) LIVE.goldUSDoz   = item.xauPrice;
+    if (item.xagPrice > 0) LIVE.silverUSDoz = item.xagPrice;
     LIVE.apiStatus.metals = 'live';
-    return;
   }
-  // Fallback: metals.live (no key)
-  const d2 = await safeProxiedFetch('https://metals.live/api/spot');
-  if (d2 && Array.isArray(d2)) {
-    const gold   = d2.find(m=>m.metal==='XAU'||m.metal==='gold');
-    const silver = d2.find(m=>m.metal==='XAG'||m.metal==='silver');
-    if (gold?.price)   LIVE.goldUSDoz   = gold.price;
-    if (silver?.price) LIVE.silverUSDoz = silver.price;
-    LIVE.apiStatus.metals = 'live';
-    return;
+
+  // Source 2 (fallback if source 1 failed): metals.live
+  if (LIVE.apiStatus.metals !== 'live') {
+    const d2 = await safeProxiedFetch('https://metals.live/api/spot');
+    if (Array.isArray(d2) && d2.length) {
+      const gold   = d2.find(m => ['xau','gold'].includes((m.metal||'').toLowerCase()));
+      const silver = d2.find(m => ['xag','silver'].includes((m.metal||'').toLowerCase()));
+      if (gold?.price   > 0) LIVE.goldUSDoz   = gold.price;
+      if (silver?.price > 0) LIVE.silverUSDoz = silver.price;
+      LIVE.apiStatus.metals = 'live';
+    }
   }
-  LIVE.apiStatus.metals = 'fallback';
+
+  // Source 3 (fallback): Yahoo Finance GC=F + SI=F futures via v7 quote (via proxy)
+  if (LIVE.apiStatus.metals !== 'live') {
+    const d3 = await safeProxiedFetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols=GC%3DF%2CSI%3DF&fields=regularMarketPrice,symbol');
+    (d3?.quoteResponse?.result || []).forEach(q => {
+      if (q.symbol === 'GC=F' && q.regularMarketPrice > 0) LIVE.goldUSDoz   = q.regularMarketPrice;
+      if (q.symbol === 'SI=F' && q.regularMarketPrice > 0) LIVE.silverUSDoz = q.regularMarketPrice;
+    });
+    if (LIVE.goldUSDoz > 0) LIVE.apiStatus.metals = 'live';
+  }
+
+  // Source 4 (last resort): Stooq XAUUSD + XAGUSD spot
+  if (LIVE.apiStatus.metals !== 'live') {
+    const [gR, sR] = await Promise.all([
+      safeProxiedFetch('https://stooq.com/q/l/?s=xauusd&f=sd2t2ohlcv&h&e=json'),
+      safeProxiedFetch('https://stooq.com/q/l/?s=xagusd&f=sd2t2ohlcv&h&e=json')
+    ]);
+    const gc = parseFloat(gR?.symbols?.[0]?.close);
+    const sc = parseFloat(sR?.symbols?.[0]?.close);
+    if (gc > 0) { LIVE.goldUSDoz   = gc; LIVE.apiStatus.metals = 'live'; }
+    if (sc > 0)   LIVE.silverUSDoz = sc;
+  }
+
+  if (LIVE.apiStatus.metals !== 'live') LIVE.apiStatus.metals = 'fallback';
+
+  // --- Fetch NSE ETF prices: GoldBEES + SilverBEES ---
+  // Strategy: Yahoo Finance v8 chart (gives true LTP via meta.regularMarketPrice),
+  // then v7 quote as fallback, then Stooq as last resort.
+  // GoldBEES: 1 unit ≈ 0.01g gold; SilverBEES: 1 unit ≈ 1g silver (priced in INR)
+
+  async function fetchNseEtfPrice(yahooSymbol, stooqSymbol) {
+    // Source A: Yahoo v8 chart — meta.regularMarketPrice is true LTP
+    try {
+      const enc = encodeURIComponent(yahooSymbol);
+      const v8 = await safeProxiedFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${enc}?interval=1d&range=1d`);
+      const ltp = v8?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (ltp > 0) return ltp;
+    } catch(e) {}
+
+    // Source B: Yahoo v7 quote (regularMarketPrice)
+    try {
+      const enc = encodeURIComponent(yahooSymbol);
+      const v7 = await safeProxiedFetch(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${enc}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`);
+      const q = (v7?.quoteResponse?.result || []).find(r => r.symbol === yahooSymbol);
+      if (q?.regularMarketPrice > 0) return q.regularMarketPrice;
+    } catch(e) {}
+
+    // Source C: Stooq (e.g. goldbees.ns)
+    try {
+      const stooq = await safeProxiedFetch(`https://stooq.com/q/l/?s=${encodeURIComponent(stooqSymbol)}&f=sd2t2ohlcv&h&e=json`);
+      const close = parseFloat(stooq?.symbols?.[0]?.close);
+      if (close > 0) return close;
+    } catch(e) {}
+
+    return 0;
+  }
+
+  const [gbPrice, sbPrice] = await Promise.all([
+    fetchNseEtfPrice('GOLDBEES.NS',   'goldbees.ns'),
+    fetchNseEtfPrice('SILVERBEES.NS', 'silverbees.ns')
+  ]);
+  if (gbPrice > 0) LIVE.goldBeesINR   = gbPrice;
+  if (sbPrice > 0) LIVE.silverBeesINR = sbPrice;
+}
+
+// ---- OIL ----
+// Spread constants (all vs Brent, which is the global benchmark):
+//   Dubai/Oman  ≈ Brent − 1.5  (ME sour crude, slight discount)
+//   Urals       ≈ Brent − 11   (Russian sanctions discount)
+//   China SHFE  ≈ Brent − 1.0  (Shanghai spot, slight discount)
+// WTI-Brent spread is typically +$2–3 (Brent > WTI) and fetched directly where possible.
+function applyOilSpreads(wti, brent) {
+  LIVE.wtiUSD   = wti;
+  LIVE.brentUSD = brent;
+  LIVE.dubaiUSD = brent - 1.5;
+  LIVE.uralsUSD = brent - 11;
+  LIVE.chinaUSD = brent - 1.0;
 }
 
 async function fetchOil() {
-  // Primary: Stooq — free public market data, no key, routed via CORS proxy
-  // WTI (CL.F) and Brent (BZ.F) futures
-  const [wtiRaw, brentRaw] = await Promise.all([
-    safeProxiedFetch('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=json'),
-    safeProxiedFetch('https://stooq.com/q/l/?s=bz.f&f=sd2t2ohlcv&h&e=json')
+  // Helper: median of a non-empty array
+  function median(arr) {
+    const s = [...arr].sort((a,b)=>a-b);
+    const m = Math.floor(s.length/2);
+    return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+  }
+  // Plausible crude oil price sanity gate: $30–$200/barrel
+  function oilOk(v) { return v > 30 && v < 200; }
+
+  // --- Source 1: Stooq SPOT tickers (same pattern as gold xauusd) ---
+  // xtiusd = WTI crude spot, xbrusd = Brent crude spot
+  const [wtiSpot, brentSpot] = await Promise.all([
+    safeProxiedFetch('https://stooq.com/q/l/?s=xtiusd&f=sd2t2ohlcv&h&e=json'),
+    safeProxiedFetch('https://stooq.com/q/l/?s=xbrusd&f=sd2t2ohlcv&h&e=json')
   ]);
-  const wtiClose   = parseFloat(wtiRaw?.symbols?.[0]?.close);
-  const brentClose = parseFloat(brentRaw?.symbols?.[0]?.close);
-  if (wtiClose > 0) {
-    LIVE.wtiUSD   = wtiClose;
-    LIVE.brentUSD = brentClose > 0 ? brentClose : wtiClose + 2.5;
-    LIVE.dubaiUSD = LIVE.wtiUSD + 0.5;   // Dubai/Oman trades near Brent
-    LIVE.uralsUSD = LIVE.brentUSD - 11;   // Urals ~$11 discount to Brent (sanctions)
-    LIVE.chinaUSD = LIVE.brentUSD - 1.0;  // SHFE crude tracks Brent closely
+  const wtiS1   = parseFloat(wtiSpot?.symbols?.[0]?.close);
+  const brentS1 = parseFloat(brentSpot?.symbols?.[0]?.close);
+  if (oilOk(wtiS1)) {
+    applyOilSpreads(wtiS1, oilOk(brentS1) ? brentS1 : wtiS1 + 2.5);
     LIVE.apiStatus.oil = 'live';
     return;
   }
-  // Fallback: Yahoo Finance CL=F via CORS proxy
-  const d2 = await safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/CL=F?interval=1d&range=1d');
-  if (d2?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-    LIVE.wtiUSD   = d2.chart.result[0].meta.regularMarketPrice;
-    LIVE.brentUSD = LIVE.wtiUSD + 2.5;
-    LIVE.dubaiUSD = LIVE.wtiUSD + 0.5;
-    LIVE.uralsUSD = LIVE.wtiUSD - 8.5;
-    LIVE.chinaUSD = LIVE.wtiUSD + 1.5;
-    LIVE.apiStatus.oil = 'live-yahoo';
+
+  // --- Source 2: Yahoo Finance v8 chart continuous futures CL=F / BZ=F ---
+  const [wtiV8, brentV8] = await Promise.all([
+    safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF?interval=1d&range=1d'),
+    safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/BZ%3DF?interval=1d&range=1d')
+  ]);
+  const wtiS2   = wtiV8?.chart?.result?.[0]?.meta?.regularMarketPrice;
+  const brentS2 = brentV8?.chart?.result?.[0]?.meta?.regularMarketPrice;
+  if (oilOk(wtiS2)) {
+    applyOilSpreads(wtiS2, oilOk(brentS2) ? brentS2 : wtiS2 + 2.5);
+    LIVE.apiStatus.oil = 'live';
     return;
   }
+
+  // --- Source 3: Stooq futures CL.F / BZ.F ---
+  const [wtiF, brentF] = await Promise.all([
+    safeProxiedFetch('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=json'),
+    safeProxiedFetch('https://stooq.com/q/l/?s=bz.f&f=sd2t2ohlcv&h&e=json')
+  ]);
+  const wtiS3   = parseFloat(wtiF?.symbols?.[0]?.close);
+  const brentS3 = parseFloat(brentF?.symbols?.[0]?.close);
+  if (oilOk(wtiS3)) {
+    applyOilSpreads(wtiS3, oilOk(brentS3) ? brentS3 : wtiS3 + 2.5);
+    LIVE.apiStatus.oil = 'live';
+    return;
+  }
+
+  // --- Source 4: Yahoo Finance v7 quote (last resort, may be stale) ---
+  const d4 = await safeProxiedFetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols=CL%3DF%2CBZ%3DF&fields=regularMarketPrice,symbol');
+  let wtiS4 = 0, brentS4 = 0;
+  (d4?.quoteResponse?.result || []).forEach(q => {
+    if (q.symbol === 'CL=F' && oilOk(q.regularMarketPrice)) wtiS4   = q.regularMarketPrice;
+    if (q.symbol === 'BZ=F' && oilOk(q.regularMarketPrice)) brentS4 = q.regularMarketPrice;
+  });
+  if (oilOk(wtiS4)) {
+    applyOilSpreads(wtiS4, oilOk(brentS4) ? brentS4 : wtiS4 + 2.5);
+    LIVE.apiStatus.oil = 'live';
+    return;
+  }
+
   LIVE.apiStatus.oil = 'fallback';
 }
 
+// ---- WORLD INDICES ----
 async function fetchIndices() {
-  // Single bulk request via Yahoo Finance v7 quote API — all 15 indices in ONE call.
-  // This replaces 15 separate chart requests, eliminating the 429 rate-limit on CORS proxies.
-  const symbols = [
-    '%5EGSPC','%5ENSEI','%5EN225','%5EGDAXI','%5EFCHI','%5EFTSE',
-    '000001.SS','%5EHSI','%5EKS11','%5ESTOXX50E','MOEX.ME','TA125.TA',
-    '000300.SS','%5ESTI','%5ETWII'
-  ].join(',');
-  const bulk = await safeProxiedFetch(
-    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,symbol`
-  );
+  // Use plain symbols (not pre-encoded) — safeProxiedFetch will encode the full URL
   const symMap = {
     '^GSPC':'sp500','^NSEI':'nifty50','^N225':'nikkei','^GDAXI':'dax',
     '^FCHI':'cac40','^FTSE':'ftse100','000001.SS':'sse','^HSI':'hangseng',
     '^KS11':'kospi','^STOXX50E':'euroStoxx','MOEX.ME':'moex','TA125.TA':'ta125',
     '000300.SS':'csi300','^STI':'sti','^TWII':'taiex'
   };
-  let anyLive = false;
-  const qResults = bulk?.quoteResponse?.result || [];
-  qResults.forEach(q => {
+  // Build symbol list with individual encodeURIComponent per symbol, joined by comma
+  const symbolStr = Object.keys(symMap).map(s => encodeURIComponent(s)).join('%2C');
+  let filled = 0;
+
+  // Source 1: Yahoo Finance v7 bulk quote
+  const bulk = await safeProxiedFetch(
+    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolStr}&fields=regularMarketPrice%2Csymbol`
+  );
+  (bulk?.quoteResponse?.result || []).forEach(q => {
     const key = symMap[q.symbol];
-    if (key && q.regularMarketPrice) { LIVE[key] = q.regularMarketPrice; anyLive = true; }
+    if (key && q.regularMarketPrice > 0) { LIVE[key] = q.regularMarketPrice; filled++; }
   });
-  LIVE.apiStatus.indices = anyLive ? 'live' : 'fallback';
+  if (filled >= 8) { LIVE.apiStatus.indices = 'live'; return; }
+
+  // Source 2: Yahoo Finance v8 chart per missing index — batched 4 at a time
+  const missing = Object.entries(symMap).filter(([sym, key]) => !(LIVE[key] > 0));
+  for (let i = 0; i < missing.length; i += 4) {
+    await Promise.allSettled(missing.slice(i, i+4).map(async ([sym, key]) => {
+      const d = await safeProxiedFetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=1d`
+      );
+      const p = d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (p > 0) { LIVE[key] = p; filled++; }
+    }));
+  }
+  if (filled >= 5) { LIVE.apiStatus.indices = 'live'; return; }
+
+  // Source 3: Stooq for key indices still missing
+  const stooqMap = {'sp500':'^spx','nifty50':'^nsei','nikkei':'^nkx','dax':'^dax','ftse100':'^ftx','hangseng':'^hsi','kospi':'^ks11'};
+  const stooqMissing = Object.entries(stooqMap).filter(([key]) => !(LIVE[key] > 0));
+  await Promise.allSettled(stooqMissing.map(async ([key, sym]) => {
+    const d = await safeProxiedFetch(`https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=json`);
+    const c = parseFloat(d?.symbols?.[0]?.close);
+    if (c > 0) { LIVE[key] = c; filled++; }
+  }));
+
+  LIVE.apiStatus.indices = filled > 0 ? 'live' : 'fallback';
 }
 
 // Derive India gold/silver prices from live LBMA + duties
@@ -1093,7 +1396,6 @@ function dismissLoader() {
 }
 
 async function fetchAllAPIData() {
-  // Animate each feed row as it starts and resolves
   loaderSetActive('fx');
   loaderSetActive('metals');
   loaderSetActive('oil');
@@ -1101,24 +1403,24 @@ async function fetchAllAPIData() {
   loaderSetActive('crypto');
   loaderProgress(8);
 
-  const t0 = Date.now();
-  const wrap = async (fn, id) => {
-    const result = await fn();
-    const live = LIVE.apiStatus[id] === 'live' || LIVE.apiStatus[id] === 'live-yahoo' || LIVE.apiStatus[id] === 'live-frankfurter';
-    loaderSetDone(id, live);
-    return result;
-  };
-
+  const isLive = id => LIVE.apiStatus[id] === 'live' || LIVE.apiStatus[id] === 'live-yahoo' || LIVE.apiStatus[id] === 'live-frankfurter';
   let done = 0;
   const tick = () => { done++; loaderProgress(Math.min(8 + done * 18, 95)); };
 
+  // FX must resolve FIRST — metals/India prices depend on the USD→INR rate
+  await fetchFX();
+  loaderSetDone('fx', isLive('fx'));
+  tick();
+
+  // Now run metals (includes ETF fetch), oil, indices, crypto in parallel
   await Promise.allSettled([
-    wrap(fetchFX,       'fx'     ).then(tick),
-    wrap(fetchGoldSilver,'metals').then(tick),
-    wrap(fetchOil,      'oil'    ).then(tick),
-    wrap(fetchIndices,  'indices').then(tick),
-    wrap(fetchCrypto,   'crypto' ).then(tick),
+    fetchGoldSilver().then(() => { loaderSetDone('metals', isLive('metals')); tick(); }),
+    fetchOil()       .then(() => { loaderSetDone('oil',    isLive('oil'));    tick(); }),
+    fetchIndices()   .then(() => { loaderSetDone('indices',isLive('indices'));tick(); }),
+    fetchCrypto()    .then(() => { loaderSetDone('crypto', isLive('crypto')); tick(); }),
   ]);
+
+  // Derive India MCX/gray/DeFi prices from live LBMA + live FX
   deriveIndiaPrices();
 }
 
@@ -1197,7 +1499,12 @@ function renderGold() {
   const defiPG    = fromINR(defiINRg);
   const defiUSDg  = defiINRg / LIVE.fx.USD;
 
-  const beesPG    = fromINR(jitter(LIVE.goldBeesINR, 0.002));
+  // GoldBEES NSE: 1 unit = 0.01g of gold (99.5% purity).
+  // NSE unit price ~₹96-100/unit. Per-gram = unit price ÷ 0.01g = unit price × 100.
+  // e.g. ₹96.50/unit ÷ 0.01g/unit = ₹9,650/g  — consistent with MCX ~₹9,800/g
+  const beesUnitINR    = jitter(LIVE.goldBeesINR, 0.002);
+  const beesPerGramINR = beesUnitINR / 0.01;   // ÷ 0.01g per unit → INR per gram
+  const beesPG         = fromINR(beesPerGramINR);
 
   const chinaGoldINRg = jitter(LIVE.goldChinainr, 0.002);
   const chinaGoldPG   = fromINR(chinaGoldINRg);
@@ -1209,17 +1516,18 @@ function renderGold() {
   const colorsForChart = ['#D4AF37','#FF9933','#8890A4','#F7931A','#9370DB','#de2910'];
   const selectedIdx = chartState.gold.idx;
 
-  // Cards — single exchange-rate line matching Basis column
-  const apiTag = LIVE.apiStatus.metals==='live' ? '<span style="color:#2ECC71;font-size:9px">● LIVE</span>' : '<span style="color:#8890A4;font-size:9px">● REF</span>';
+  // Cards — LIVE/CLOSED is purely time-based, independent of API fetch status
+  const metalsTag = liveTag(isMetalsMarketOpen());
+  const nseOpen = isExchangeOpen('nifty50'); // NSE ETF hours — time-based only
   document.getElementById('goldCards').innerHTML = [
-    {src:t('cardLbma')||'LBMA Spot',       lbl:t('goldCard24k')||'24K Gold / gram', price:spotPG,  basisLine:`${fmtUSD(spotUSDg,2)}/g`,  acc:'#D4AF37', sub:(t('goldCardIntlSpot')||'International spot')+' '+apiTag},
-    {src:t('cardMcx')||'MCX India',         lbl:t('goldCard24k')||'24K Gold / gram', price:mcxPG,   basisLine:`₹${mcxINRg.toFixed(2)}/g`, acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian market'},
-    {src:t('cardGray')||'Gray Market',       lbl:t('goldCard24k')||'24K Gold / gram', price:grayPG,  basisLine:`₹${grayINRg.toFixed(2)}/g`,acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no GST invoice'},
-    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('goldCardDefi')||'Tokenized Gold/g PAXG',price:defiPG,basisLine:`${fmtUSD(defiUSDg,2)}/g`,acc:'#F7931A',sub:t('goldCardOracle')||'PAXG · XAUT oracle'},
-    {src:t('cardGoldBees')||'GoldBEES NSE',  lbl:t('goldCardEtf')||'Per gram via ETF',price:beesPG,  basisLine:`₹${LIVE.goldBeesINR.toFixed(2)}/g`,acc:'#9370DB',sub:t('goldCardUnit')||'1 unit = 0.01g gold'},
-    {src:t('cardChinaSge')||'China SGE',      lbl:t('goldCard24k')||'24K Gold / gram',  price:chinaGoldPG, basisLine:`${fmtUSD(chinaGoldUSDg,2)}/g`, acc:'#de2910', sub:t('goldCardChinaSge')||'SGE Shanghai Gold Exchange'},
+    {src:t('cardLbma')||'LBMA Spot',       lbl:t('goldCard24k')||'24K Gold / gram', price:spotPG,  basisLine:`${fmtUSD(spotUSDg,2)}/g`,  acc:'#D4AF37', sub:(t('goldCardIntlSpot')||'International spot'), tag:metalsTag},
+    {src:t('cardMcx')||'MCX India',         lbl:t('goldCard24k')||'24K Gold / gram', price:mcxPG,   basisLine:`₹${mcxINRg.toFixed(2)}/g`, acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian market', tag:metalsTag},
+    {src:t('cardGray')||'Gray Market',       lbl:t('goldCard24k')||'24K Gold / gram', price:grayPG,  basisLine:`₹${grayINRg.toFixed(2)}/g`,acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no GST invoice', tag:metalsTag},
+    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('goldCardDefi')||'Tokenized Gold/g PAXG',price:defiPG,basisLine:`${fmtUSD(defiUSDg,2)}/g`,acc:'#F7931A',sub:t('goldCardOracle')||'PAXG · XAUT oracle', tag:metalsTag},
+    {src:t('cardGoldBees')||'GoldBEES NSE',  lbl:t('goldCardEtf')||'Per gram via ETF',price:beesPG,  basisLine:`₹${beesPerGramINR.toFixed(2)}/g (unit ₹${beesUnitINR.toFixed(2)})`,acc:'#9370DB',sub:'1 unit = 0.01g gold (NSE ETF)', tag:liveTag(nseOpen)},
+    {src:t('cardChinaSge')||'China SGE',      lbl:t('goldCard24k')||'24K Gold / gram',  price:chinaGoldPG, basisLine:`${fmtUSD(chinaGoldUSDg,2)}/g`, acc:'#de2910', sub:t('goldCardChinaSge')||'SGE Shanghai Gold Exchange', tag:metalsTag},
   ].map(c=>`<div class="price-card" style="--accent:${c.acc}">
-    <div class="card-source">${c.src}</div>
+    <div class="card-source">${c.src} ${c.tag}</div>
     <div class="card-label">${c.lbl}</div>
     <div class="card-price" style="color:${c.acc}">${fmt(c.price,2)}</div>
     <div class="card-sub">${c.basisLine}</div>
@@ -1233,7 +1541,7 @@ function renderGold() {
     {src:t('tblMcx')||'MCX India (Duty-paid)',          badge:'badge-india', type:'Futures', pg:mcxPG,   basisVal:mcxPG,   ref:false},
     {src:t('tblGray')||'Gray Market India (Cash OTC)',  badge:'badge-gray',  type:'OTC Cash',pg:grayPG,  basisVal:grayPG,  ref:false},
     {src:t('tblDefi')||'Blockchain DeFi (PAXG/XAUT)',  badge:'badge-defi',  type:'Token',   pg:defiPG,  basisVal:defiPG,  ref:false},
-    {src:t('tblGoldBees')||'GoldBEES NSE ETF',         badge:'badge-etf',   type:'ETF×100', pg:beesPG,       basisVal:beesPG,       ref:false},
+    {src:t('tblGoldBees')||'GoldBEES NSE ETF',         badge:'badge-etf',   type:'ETF 0.01g', pg:beesPG,       basisVal:beesPG,       ref:false},
     {src:t('tblChinaSge')||'China SGE (Shanghai)',      badge:'badge-china', type:'SGE Spot', pg:chinaGoldPG,  basisVal:chinaGoldPG,  ref:false},
   ];
   document.getElementById('goldTable').innerHTML = rows.map((r,i)=>
@@ -1298,15 +1606,17 @@ function renderSilver() {
   const selectedIdx = chartState.silver.idx;
 
   const apiTag = LIVE.apiStatus.metals==='live' ? '<span style="color:#2ECC71;font-size:9px">● LIVE</span>' : '<span style="color:#8890A4;font-size:9px">● REF</span>';
+  const silverMetalsTag = liveTag(isMetalsMarketOpen()); // purely time-based
+  const silverNseOpen = isExchangeOpen('nifty50');        // purely time-based
   document.getElementById('silverCards').innerHTML = [
-    {src:t('cardLbma')||'LBMA Spot',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:spotPG, basisLine:`${fmtUSD(spotUSDg,4)}/g`,   acc:'#A8A9AD', sub:(t('goldCardIntlSpot')||'International spot')+' '+apiTag},
-    {src:t('cardMcx')||'MCX India',         lbl:t('silverCardFine')||'Fine Silver / gram',  price:mcxPG,  basisLine:`₹${mcxINRg.toFixed(2)}/g`,  acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian mkt'},
-    {src:t('cardGray')||'Gray Market',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:grayPG, basisLine:`₹${grayINRg.toFixed(2)}/g`, acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no invoice'},
-    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('silverCardDefi')||'Tokenized Silver/g $PSLV',price:defiPG,basisLine:`${fmtUSD(defiUSDg,4)}/g`,acc:'#F7931A',sub:t('silverCardOracle')||'PSLV · LODE oracle'},
-    {src:t('cardSilverBees')||'SilverBEES NSE',lbl:t('goldCardEtf')||'Per gram via ETF',  price:beesPG, basisLine:`₹${beesINRg.toFixed(2)}/unit=1g`,acc:'#9370DB',sub:t('silverCardUnit')||'1 unit = 1g silver'},
-    {src:t('cardChinaSge')||'China SGE',       lbl:t('silverCardFine')||'Fine Silver / gram', price:chinaSilverPG, basisLine:`${fmtUSD(chinaSilverUSDg,4)}/g`, acc:'#de2910', sub:t('silverCardChinaSge')||'SGE Shanghai Silver Exchange'},
+    {src:t('cardLbma')||'LBMA Spot',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:spotPG, basisLine:`${fmtUSD(spotUSDg,4)}/g`,   acc:'#A8A9AD', sub:(t('goldCardIntlSpot')||'International spot'), tag:silverMetalsTag},
+    {src:t('cardMcx')||'MCX India',         lbl:t('silverCardFine')||'Fine Silver / gram',  price:mcxPG,  basisLine:`₹${mcxINRg.toFixed(2)}/g`,  acc:'#FF9933', sub:t('goldCardDuty')||'Duty-paid Indian mkt', tag:silverMetalsTag},
+    {src:t('cardGray')||'Gray Market',       lbl:t('silverCardFine')||'Fine Silver / gram',  price:grayPG, basisLine:`₹${grayINRg.toFixed(2)}/g`, acc:'#8890A4', sub:t('goldCardOtc')||'OTC cash, no invoice', tag:silverMetalsTag},
+    {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('silverCardDefi')||'Tokenized Silver/g $PSLV',price:defiPG,basisLine:`${fmtUSD(defiUSDg,4)}/g`,acc:'#F7931A',sub:t('silverCardOracle')||'PSLV · LODE oracle', tag:silverMetalsTag},
+    {src:t('cardSilverBees')||'SilverBEES NSE',lbl:t('goldCardEtf')||'Per gram via ETF',  price:beesPG, basisLine:`₹${beesINRg.toFixed(2)}/unit=1g`,acc:'#9370DB',sub:t('silverCardUnit')||'1 unit = 1g silver', tag:liveTag(silverNseOpen)},
+    {src:t('cardChinaSge')||'China SGE',       lbl:t('silverCardFine')||'Fine Silver / gram', price:chinaSilverPG, basisLine:`${fmtUSD(chinaSilverUSDg,4)}/g`, acc:'#de2910', sub:t('silverCardChinaSge')||'SGE Shanghai Silver Exchange', tag:silverMetalsTag},
   ].map(c=>`<div class="price-card" style="--accent:${c.acc}">
-    <div class="card-source">${c.src}</div>
+    <div class="card-source">${c.src} ${c.tag}</div>
     <div class="card-label">${c.lbl}</div>
     <div class="card-price" style="color:${c.acc}">${fmt(c.price,4)}</div>
     <div class="card-sub">${c.basisLine}</div>
@@ -1376,17 +1686,17 @@ function renderOil() {
   const colorsForChart = ['#4A90D9','#2980B9','#E67E22','#d52b1e','#de2910','#8890A4'];
   const selectedIdx = chartState.oil.idx;
   const chg = randChg(1.4);
-  const apiTag = LIVE.apiStatus.oil==='live'||LIVE.apiStatus.oil==='live-yahoo' ? ' <span style="color:#2ECC71;font-size:9px">● LIVE</span>' : '';
+  const oilTag = liveTag(isOilMarketOpen()); // purely time-based — independent of API status
 
   document.getElementById('oilCards').innerHTML = [
-    {src:t('oilCardWti')||'WTI Crude',        lbl:t('oilLblUs')||'Per barrel (US)',    price:wtiConv,   raw:`${fmtUSD(wtiUSD)}/bbl`,    acc:'#4A90D9', sub:(t('oilSubNymex')||'NYMEX benchmark')+apiTag},
+    {src:t('oilCardWti')||'WTI Crude',        lbl:t('oilLblUs')||'Per barrel (US)',    price:wtiConv,   raw:`${fmtUSD(wtiUSD)}/bbl`,    acc:'#4A90D9', sub:(t('oilSubNymex')||'NYMEX benchmark')},
     {src:t('oilCardBrent')||'Brent Crude',      lbl:t('oilLblIntl')||'Per barrel (Intl)',  price:brentConv, raw:`${fmtUSD(brentUSD)}/bbl`,  acc:'#2980B9', sub:t('oilSubIce')||'ICE London benchmark'},
     {src:t('oilCardDubai')||'Dubai Fateh/Oman', lbl:t('oilLblMe')||'Per barrel (ME)',    price:dubaiConv, raw:`${fmtUSD(dubaiUSD)}/bbl`,  acc:'#E67E22', sub:t('oilSubMe')||'Middle East benchmark'},
     {src:t('oilCardUrals')||'Urals (Russia)',   lbl:t('oilLblBarrel')||'Per barrel',         price:uralsConv, raw:`${fmtUSD(uralsUSD)}/bbl`,  acc:'#d52b1e', sub:t('oilSubUrals')||'Russian export grade'},
     {src:t('oilCardChina')||'China Crude',      lbl:t('oilLblShanghai')||'Shanghai spot',      price:chinaConv, raw:`${fmtUSD(chinaUSD)}/bbl`,  acc:'#de2910', sub:t('oilSubShfe')||'SHFE crude spot'},
     {src:t('oilCardGray')||'Gray Market',      lbl:t('oilLblOtc')||'OTC crude equiv.',   price:grayConv,  raw:`${fmtUSD(grayUSD)}/bbl`,   acc:'#8890A4', sub:t('oilSubGray')||'~1.5% above WTI OTC'},
   ].map(c=>`<div class="price-card" style="--accent:${c.acc}">
-    <div class="card-source">${c.src}</div>
+    <div class="card-source">${c.src} ${oilTag}</div>
     <div class="card-label">${c.lbl}</div>
     <div class="card-price" style="color:${c.acc}">${fmt(c.price,2)}</div>
     <div class="card-sub">${c.raw}</div>
@@ -1416,22 +1726,22 @@ function renderOil() {
 // WORLD INDICES
 // ============================================================
 const SP_INDICES = [
-  {key:'sp500',    name:'S&P 500',        countryKey:'United States',  cur:'USD', badge:'badge-world',  chgMag:0.6, cardShow:true},
-  {key:'nifty50',  name:'Nifty 50',       countryKey:'India',          cur:'INR', badge:'badge-india',  chgMag:0.5, cardShow:true},
-  {key:'nikkei',   name:'Nikkei 225',     countryKey:'Japan',          cur:'JPY', badge:'badge-japan',  chgMag:0.9, cardShow:true},
-  {key:'dax',      name:'DAX',            countryKey:'Germany',        cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true},
-  {key:'cac40',    name:'CAC 40',         countryKey:'France',         cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true},
-  {key:'ftse100',  name:'FTSE 100',       countryKey:'United Kingdom', cur:'GBP', badge:'badge-world',  chgMag:0.6, cardShow:true},
-  {key:'sse',      name:'Shanghai (SSE)', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:1.0, cardShow:true},
-  {key:'hangseng', name:'Hang Seng',      countryKey:'Hong Kong',      cur:'HKD', badge:'badge-china',  chgMag:1.1, cardShow:true},
-  {key:'csi300',   name:'CSI 300',        countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:0.8, cardShow:true},
-  {key:'euroStoxx',name:'EURO STOXX 50',  countryKey:'Euro Area',      cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true},
-  {key:'ta125',    name:'TA-125',         countryKey:'Israel',         cur:'ILS', badge:'badge-israel', chgMag:0.9, cardShow:true},
-  {key:'moex',     name:'MOEX (CFD)',     countryKey:'Russia',         cur:'RUB', badge:'badge-russia', chgMag:1.2, cardShow:true},
-  {key:'kospi',    name:'Kospi',          countryKey:'South Korea',    cur:'KRW', badge:'badge-korea',  chgMag:0.9, cardShow:true},
-  {key:'panArab',  name:'S&P Pan Arab',   countryKey:'Pan Arab',       cur:'USD', badge:'badge-world',  chgMag:0.7, cardShow:true},
-  {key:'sti',      name:'Straits Times (STI)', countryKey:'Singapore', cur:'SGD', badge:'badge-world',  chgMag:0.6, cardShow:true},
-  {key:'taiex',    name:'TAIEX',          countryKey:'Taiwan',         cur:'TWD', badge:'badge-world',  chgMag:0.8, cardShow:true},
+  {key:'sp500',    name:'S&P 500',        countryKey:'United States',  cur:'USD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sp500'},
+  {key:'nifty50',  name:'Nifty 50',       countryKey:'India',          cur:'INR', badge:'badge-india',  chgMag:0.5, cardShow:true, exchangeKey:'nifty50'},
+  {key:'nikkei',   name:'Nikkei 225',     countryKey:'Japan',          cur:'JPY', badge:'badge-japan',  chgMag:0.9, cardShow:true, exchangeKey:'nikkei'},
+  {key:'dax',      name:'DAX',            countryKey:'Germany',        cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'dax'},
+  {key:'cac40',    name:'CAC 40',         countryKey:'France',         cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'cac40'},
+  {key:'ftse100',  name:'FTSE 100',       countryKey:'United Kingdom', cur:'GBP', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'ftse100'},
+  {key:'sse',      name:'Shanghai (SSE)', countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:1.0, cardShow:true, exchangeKey:'sse'},
+  {key:'hangseng', name:'Hang Seng',      countryKey:'Hong Kong',      cur:'HKD', badge:'badge-china',  chgMag:1.1, cardShow:true, exchangeKey:'hangseng'},
+  {key:'csi300',   name:'CSI 300',        countryKey:'China',          cur:'CNY', badge:'badge-china',  chgMag:0.8, cardShow:true, exchangeKey:'csi300'},
+  {key:'euroStoxx',name:'EURO STOXX 50',  countryKey:'Euro Area',      cur:'EUR', badge:'badge-eu',     chgMag:0.7, cardShow:true, exchangeKey:'euroStoxx'},
+  {key:'ta125',    name:'TA-125',         countryKey:'Israel',         cur:'ILS', badge:'badge-israel', chgMag:0.9, cardShow:true, exchangeKey:'ta125'},
+  {key:'moex',     name:'MOEX (CFD)',     countryKey:'Russia',         cur:'RUB', badge:'badge-russia', chgMag:1.2, cardShow:true, exchangeKey:'moex'},
+  {key:'kospi',    name:'Kospi',          countryKey:'South Korea',    cur:'KRW', badge:'badge-korea',  chgMag:0.9, cardShow:true, exchangeKey:'kospi'},
+  {key:'panArab',  name:'S&P Pan Arab',   countryKey:'Pan Arab',       cur:'USD', badge:'badge-world',  chgMag:0.7, cardShow:true, exchangeKey:'panArab'},
+  {key:'sti',      name:'Straits Times (STI)', countryKey:'Singapore', cur:'SGD', badge:'badge-world',  chgMag:0.6, cardShow:true, exchangeKey:'sti'},
+  {key:'taiex',    name:'TAIEX',          countryKey:'Taiwan',         cur:'TWD', badge:'badge-world',  chgMag:0.8, cardShow:true, exchangeKey:'taiex'},
 ];
 
 function renderSP() {
@@ -1446,16 +1756,23 @@ function renderSP() {
     return fromINR(val * (LIVE.fx[cur] || 1));
   }
 
-  const apiTag = LIVE.apiStatus.indices==='live';
+  // LIVE/CLOSED badge is purely time-based (exchange session hours) — independent of API fetch status
+  // apiLive only affects whether we show a "fallback data" warning, not the open/closed status
+  const apiLive = LIVE.apiStatus.indices==='live';
   const cardIndices = indices.filter(i=>i.cardShow);
   document.getElementById('spCards').innerHTML = cardIndices.map(idx=>{
     const conv = nativeToSelected(idx.native, idx.cur);
     const ns = nativeSym(idx.cur);
+    // Market open/closed is purely time-based, regardless of data source
+    const exchOpen = isExchangeOpen(idx.exchangeKey);
+    const tag = exchOpen
+      ? '<span style="color:#2ECC71;font-size:9px;font-weight:600;margin-left:2px">● LIVE</span>'
+      : '<span style="color:#8890A4;font-size:9px;margin-left:2px">● CLOSED</span>';
     return `<div class="price-card" style="--accent:#2ECC71">
-      <div class="card-source">${idx.country}${apiTag?' <span style="color:#2ECC71;font-size:8px">●</span>':''}</div>
+      <div class="card-source">${idx.country} ${tag}</div>
       <div class="card-label">${idx.name}</div>
       <div class="card-price" style="color:#2ECC71">${sym()}${conv.toLocaleString('en-US',{maximumFractionDigits:0})}</div>
-      <div class="card-sub">${ns}${idx.native.toLocaleString('en-US',{maximumFractionDigits:2})} ${t('spNative')||'native'}</div>
+      <div class="card-sub">${ns}${idx.native.toLocaleString('en-US',{maximumFractionDigits:2})} ${t('spNative')||'native'}${!apiLive?' <span style="color:#E67E22;font-size:8px">(ref)</span>':''}</div>
       ${chgBadge(idx.chg)}
     </div>`;
   }).join('');
@@ -1516,6 +1833,7 @@ function renderCrypto() {
   const selectedIdx = chartState.crypto.idx;
   const selCoin = CRYPTO_COINS[selectedIdx];
   const apiTag = LIVE.apiStatus.crypto==='live';
+  const cryptoLiveTag = '<span style="color:#2ECC71;font-size:9px;font-weight:600;margin-left:2px">● LIVE</span>';
 
   // Helper: format large USD numbers (billions/millions) with B/M suffix
   function fmtLarge(usdVal) {
@@ -1538,7 +1856,7 @@ function renderCrypto() {
     const mcapUSD = LIVE[c.key+'_mcap'] || (c.mcapB * 1e9);
     const vol24USD = LIVE[c.key+'_vol'] || (c.vol24B * 1e9);
     return `<div class="price-card" style="--accent:${c.color}">
-      <div class="card-source">${c.sym}${apiTag?' <span style="color:#2ECC71;font-size:8px">●</span>':''}</div>
+      <div class="card-source">${c.sym} ${cryptoLiveTag}</div>
       <div class="card-label">${c.name}</div>
       <div class="card-price" style="color:${c.color}">${fmt(spotConv,dec)}</div>
       <div class="card-sub">${fmtUSD(spotUSD, spotUSD<0.01?6:spotUSD<1?4:2)} USDT</div>
