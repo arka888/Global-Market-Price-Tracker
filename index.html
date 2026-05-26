@@ -827,7 +827,12 @@ const TRANSLATIONS = {
     donateMsg:'<strong>"You didn\'t have to stop. You didn\'t have to care. But you did — and that changes everything."</strong><br><br>From the bottom of my heart, <em>thank you</em> for visiting this page and even considering supporting this project. In a world full of choices, you chose to pause and look here — and that means the world to me. Your kindness is the very reason independent builders like me keep creating. Whether you donate or simply spread the word, you are already part of something beautiful.',
     donateFlowNotice:'<strong>Flow Network Only</strong> — Donations are accepted exclusively on the <strong>Flow Blockchain</strong> (Flow Cadence or Flow EVM). Please ensure you\'re sending from a Flow-compatible wallet.',
     donateWalletTitle:'Donation Wallet Addresses',
-    copyBtn:'Copy'},
+    copyBtn:'Copy',
+    oilCardOrb:'OPEC Basket',
+    oilSubOrb:'OPEC Reference Basket',
+    oilTblOrb:'OPEC Basket (ORB)',
+    oilGradeOrb:'OPEC Blends',
+    oilChartOrb:'OPEC Basket (ORB)'},
   zh:{gold:'黄金',silver:'白银',oil:'原油',indices:'世界指数',crypto:'加密货币',refresh:'刷新',source:'来源',type:'类型',priceGram:'价格/克',vsIntl:'对国际现货',basis:'基准',grade:'等级',priceBarrel:'价格/桶',vsWti:'对WTI',basisUsd:'基准(美元)',index:'指数',country:'国家/地区',levelCur:'指数值(所选货币)',change:'变动',nativeVal:'本地货币值',coin:'币种',globalSpot:'全球现货',indiaCex:'印度交易所',grayMkt:'场外P2P',oracle:'区块链预言机',indiaPrem:'印度溢价',vol24h:'成交量(24h)',mktCap:'市值',volMktCap:'量/市值(24h)',goldTitle:'黄金 — 每克(24K)所有来源',silverTitle:'白银 — 每克(999)所有来源',oilTitle:'原油 — 每桶(所有来源)',indicesTitle:'全球股票指数 — 所有市场',cryptoTitle:'加密货币 — 多渠道价格对比',trendTitle:'30天趋势 + 15天预测',predTitle:'价格预测',goldSub:'公式：美元/盎司 ÷ 31.1035 × 汇率',oilSub:'WTI = 美国基准 · 布伦特 = 国际',indicesSub:'以所选货币显示 · 原始值见基准列',cryptoSub:'全球现货 · 场外P2P · 链上预言机 · 24h成交量与市值',updated:'已更新',
     appTitle:'全球市场',appTitleSpan:'价格追踪',
     cardLbma:'伦敦金现货',cardMcx:'印度MCX',cardGray:'灰色市场',cardDefi:'区块链DeFi',cardGoldBees:'黄金ETF(NSE)',cardSilverBees:'白银ETF(NSE)',
@@ -1087,6 +1092,7 @@ const LIVE = {
   dubaiUSD:     94.00,   // Brent - 1.5 (ME sour crude)
   uralsUSD:     84.50,   // Brent - 11 (Russia sanctions discount)
   chinaUSD:     94.50,   // Brent - 1.0 (SHFE Shanghai spot)
+  orbUSD:       96.50,   // Dynamically falls back between $95-$98
   // FX: 1 unit foreign = X INR (May 2026 approximate)
   fx: {
     USD: 84.10,
@@ -1776,6 +1782,8 @@ function applyOilSpreads(wti, brent) {
   LIVE.dubaiUSD = brent - 1.5;
   LIVE.uralsUSD = brent - 11;
   LIVE.chinaUSD = brent - 1.0;
+  // Dynamically generate OPEC Basket price between ~$95 - $98 as requested
+  LIVE.orbUSD   = 95.00 + (Math.random() * 3.0);
 }
 
 async function fetchOil() {
@@ -2375,7 +2383,8 @@ const OIL_CHART_OPTIONS_KEYS = [
   {key:'oilChartDubai', fallback:'Dubai Fateh/Oman DME'},
   {key:'oilChartUrals', fallback:'Urals (Russia)'},
   {key:'oilChartChina', fallback:'China Crude (SHFE)'},
-  {key:'oilChartGray',  fallback:'Gray Market OTC'}
+  {key:'oilChartGray',  fallback:'Gray Market OTC'},
+  {key:'oilChartOrb',   fallback:'OPEC Basket (ORB)'}
 ];
 function getOilChartOptions() {
   return OIL_CHART_OPTIONS_KEYS.map(o=>({label:t(o.key)||o.fallback}));
@@ -2388,6 +2397,7 @@ function renderOil() {
   const uralsUSD  = jitter(LIVE.uralsUSD, 0.004);
   const chinaUSD  = jitter(LIVE.chinaUSD, 0.003);
   const grayUSD   = jitter(wtiUSD * 1.015, 0.003); // gray ~1.5% above WTI
+  const orbUSD    = jitter(LIVE.orbUSD, 0.003);
 
   const wtiConv   = fromUSD(wtiUSD);
   const brentConv = fromUSD(brentUSD);
@@ -2395,9 +2405,10 @@ function renderOil() {
   const uralsConv = fromUSD(uralsUSD);
   const chinaConv = fromUSD(chinaUSD);
   const grayConv  = fromUSD(grayUSD);
+  const orbConv   = fromUSD(orbUSD);
 
-  const pricesForChart = [wtiConv, brentConv, dubaiConv, uralsConv, chinaConv, grayConv];
-  const colorsForChart = ['#4A90D9','#2980B9','#E67E22','#d52b1e','#de2910','#8890A4'];
+  const pricesForChart = [wtiConv, brentConv, dubaiConv, uralsConv, chinaConv, grayConv, orbConv];
+  const colorsForChart = ['#4A90D9','#2980B9','#E67E22','#d52b1e','#de2910','#8890A4','#1ABC9C'];
   const selectedIdx = chartState.oil.idx;
   const wtiChg   = chgPct(LIVE.wtiUSD,   LIVE.prev.wtiUSD,   1.4);
   const brentChg = chgPct(LIVE.brentUSD, LIVE.prev.brentUSD, 1.4);
@@ -2410,6 +2421,7 @@ function renderOil() {
   const uralsChg = brentChg + randChg(0.45);   // sanctions discount fluctuation (higher vol)
   const chinaChg = brentChg + randChg(0.25);   // SHFE domestic demand decoupling
   const grayChg  = wtiChg   + randChg(0.18);   // OTC friction/liquidity premium
+  const orbChg   = brentChg + randChg(0.15);   // OPEC basket dynamics
   const oilTag = liveTag(isOilMarketOpen()); // purely time-based — independent of API status
 
   document.getElementById('oilCards').innerHTML = [
@@ -2419,6 +2431,7 @@ function renderOil() {
     {src:t('oilCardUrals')||'Urals (Russia)',   lbl:t('oilLblBarrel')||'Per barrel',         price:uralsConv, raw:`${fmtUSD(uralsUSD)}/bbl`,  acc:'#d52b1e', sub:t('oilSubUrals')||'Russian export grade', chg:uralsChg, flag:'ru'},
     {src:t('oilCardChina')||'China Crude',      lbl:t('oilLblShanghai')||'Shanghai spot',      price:chinaConv, raw:`${fmtUSD(chinaUSD)}/bbl`,  acc:'#de2910', sub:t('oilSubShfe')||'SHFE crude spot',      chg:chinaChg, flag:'cn'},
     {src:t('oilCardGray')||'Gray Market',      lbl:t('oilLblOtc')||'OTC crude equiv.',   price:grayConv,  raw:`${fmtUSD(grayUSD)}/bbl`,   acc:'#8890A4', sub:t('oilSubGray')||'~1.5% above WTI OTC',   chg:grayChg, flag:'un'},
+    {src:t('oilCardOrb')||'OPEC Basket',      lbl:t('oilLblBarrel')||'Per barrel',      price:orbConv,   raw:`${fmtUSD(orbUSD)}/bbl`,    acc:'#1ABC9C', sub:t('oilSubOrb')||'OPEC Reference Basket', chg:orbChg, flag:'sa'},
   ].map(c=>{
     const fHtml = c.flag ? `<img src="https://flagcdn.com/w20/${c.flag}.png" srcset="https://flagcdn.com/w40/${c.flag}.png 2x" width="16" alt="${c.flag}" style="vertical-align:middle;margin-left:5px;border-radius:2px;box-shadow:0 0 2px rgba(0,0,0,0.3)">` : '';
     return `<div class="price-card" style="--accent:${c.acc}">
@@ -2438,6 +2451,7 @@ function renderOil() {
     {src:t('oilTblUrals')||'Urals (Russia)',         badge:'badge-russia', grade:t('oilGradeUrals')||'Russian Export',     priceConv:uralsConv, usd:uralsUSD, diff:uralsUSD-wtiUSD},
     {src:t('oilTblChina')||'China Crude (SHFE)',    badge:'badge-china',  grade:t('oilGradeChina')||'Shanghai Spot',      priceConv:chinaConv, usd:chinaUSD, diff:chinaUSD-wtiUSD},
     {src:t('oilTblGray')||'Gray Market OTC',       badge:'badge-gray',   grade:t('oilGradeGray')||'Unregulated OTC',   priceConv:grayConv,  usd:grayUSD,  diff:grayUSD-wtiUSD},
+    {src:t('oilTblOrb')||'OPEC Basket (ORB)',       badge:'badge-premium',grade:t('oilGradeOrb')||'OPEC Blends',        priceConv:orbConv,   usd:orbUSD,   diff:orbUSD-wtiUSD},
   ];
   document.getElementById('oilTable').innerHTML = oilRows.map((r,i)=>
     `<tr${i===0?' class="best-row"':''}><td class="source-name">${r.src}</td><td><span class="badge ${r.badge}">${r.grade}</span></td><td><strong>${fmt(r.priceConv,2)}</strong></td><td>${r.diff===null?`<span class="diff-neutral">— ${r.ref||'Reference'}</span>`:`<span class="${r.diff>=0?'diff-pos':'diff-neg'}">${r.diff>=0?'+':''}${fmtUSD(r.diff)}</span>`}</td><td>${fmtUSD(r.usd)}/bbl</td></tr>`
