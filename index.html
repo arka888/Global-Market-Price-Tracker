@@ -832,7 +832,10 @@ const TRANSLATIONS = {
     oilSubOrb:'OPEC Reference Basket',
     oilTblOrb:'OPEC Basket (ORB)',
     oilGradeOrb:'OPEC Blends',
-    oilChartOrb:'OPEC Basket (ORB)'},
+    oilChartOrb:'OPEC Basket (ORB)',
+    cardXauOtc:'XAU/USD Spot',goldCardXau:'OTC / Forex',tblXauOtc:'XAU/USD Spot (OTC / Forex)',chartXauOtc:'XAU/USD Spot',
+    cardComexGc:'COMEX Gold (GC)',goldCardComex:'NYSE / COMEX',tblComexGc:'COMEX Gold Futures (GC)',chartComexGc:'COMEX GC',
+    cardDgcx:'Dubai Gold Price',goldCardDgcx:'DGCX Exchange',tblDgcx:'Dubai Gold (DGCX)',chartDgcx:'Dubai DGCX'},
   zh:{gold:'黄金',silver:'白银',oil:'原油',indices:'世界指数',crypto:'加密货币',refresh:'刷新',source:'来源',type:'类型',priceGram:'价格/克',vsIntl:'对国际现货',basis:'基准',grade:'等级',priceBarrel:'价格/桶',vsWti:'对WTI',basisUsd:'基准(美元)',index:'指数',country:'国家/地区',levelCur:'指数值(所选货币)',change:'变动',nativeVal:'本地货币值',coin:'币种',globalSpot:'全球现货',indiaCex:'印度交易所',grayMkt:'场外P2P',oracle:'区块链预言机',indiaPrem:'印度溢价',vol24h:'成交量(24h)',mktCap:'市值',volMktCap:'量/市值(24h)',goldTitle:'黄金 — 每克(24K)所有来源',silverTitle:'白银 — 每克(999)所有来源',oilTitle:'原油 — 每桶(所有来源)',indicesTitle:'全球股票指数 — 所有市场',cryptoTitle:'加密货币 — 多渠道价格对比',trendTitle:'30天趋势 + 15天预测',predTitle:'价格预测',goldSub:'公式：美元/盎司 ÷ 31.1035 × 汇率',oilSub:'WTI = 美国基准 · 布伦特 = 国际',indicesSub:'以所选货币显示 · 原始值见基准列',cryptoSub:'全球现货 · 场外P2P · 链上预言机 · 24h成交量与市值',updated:'已更新',
     appTitle:'全球市场',appTitleSpan:'价格追踪',
     cardLbma:'伦敦金现货',cardMcx:'印度MCX',cardGray:'灰色市场',cardDefi:'区块链DeFi',cardGoldBees:'黄金ETF(NSE)',cardSilverBees:'白银ETF(NSE)',
@@ -1057,6 +1060,9 @@ const chartState = { gold:{idx:0}, silver:{idx:0}, oil:{idx:0}, sp:{idx:0}, cryp
 const LIVE = {
   // Gold: LBMA spot per troy oz in USD (~$3,350/oz as of May 2026)
   goldUSDoz:    3350.00,
+  xauOtcUSD:    4490.00,
+  comexGCUSD:   4510.00,
+  dgcxUSD:      4505.00,
   // Silver: LBMA spot per troy oz in USD (~$33.50/oz as of May 2026)
   silverUSDoz:  33.50,
   // NSE BEES Fallbacks (prices in INR per unit)
@@ -1468,7 +1474,7 @@ function chgPct(current, prev, fallbackMag=0.8) {
 // ============================================================
 async function safeFetch(url, opts={}) {
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(5000), ...opts});
+    const r = await fetch(url, {signal: AbortSignal.timeout(2000), ...opts});
     if (!r.ok) throw new Error('HTTP '+r.status);
     return await r.json();
   } catch(e) { return null; }
@@ -1509,7 +1515,7 @@ async function safeProxiedFetch(url) {
 
   // Try direct first (fast path — works when CORS headers are present)
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(4000)});
+    const r = await fetch(url, {signal: AbortSignal.timeout(2000)});
     if (r.ok) {
       const j = await r.json();
       if (j !== null) { cacheSet(cacheKey, j); return j; }
@@ -1527,7 +1533,7 @@ async function safeProxiedFetch(url) {
   }
   async function tryAlloriginsProxy() {
     try {
-      const r = await fetch(`https://api.allorigins.win/get?url=${enc}`, {signal: AbortSignal.timeout(7000)});
+      const r = await fetch(`https://api.allorigins.win/get?url=${enc}`, {signal: AbortSignal.timeout(2000)});
       if (!r.ok) return null;
       const w = await r.json();
       if (w?.contents) { const p = tryParseJSON(w.contents); return p || null; }
@@ -1536,9 +1542,9 @@ async function safeProxiedFetch(url) {
   }
 
   const proxyRace = [
-    tryProxy(fetch(`https://corsproxy.io/?${enc}`, {signal: AbortSignal.timeout(7000)})),
+    tryProxy(fetch(`https://corsproxy.io/?${enc}`, {signal: AbortSignal.timeout(2000)})),
     tryAlloriginsProxy(),
-    tryProxy(fetch(`https://api.codetabs.com/v1/proxy?quest=${enc}`, {signal: AbortSignal.timeout(7000)})),
+    tryProxy(fetch(`https://api.codetabs.com/v1/proxy?quest=${enc}`, {signal: AbortSignal.timeout(2000)})),
   ];
 
   // Return the first non-null result
@@ -1796,7 +1802,7 @@ async function fetchOil() {
     try {
       const r = await fetch(
         `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
-        { signal: AbortSignal.timeout(5000), headers: { 'Accept': 'application/json' } }
+        { signal: AbortSignal.timeout(2000), headers: { 'Accept': 'application/json' } }
       );
       if (!r.ok) return null;
       const j = await r.json();
@@ -1812,7 +1818,7 @@ async function fetchOil() {
     try {
       const r = await fetch(
         `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`,
-        { signal: AbortSignal.timeout(5000), headers: { 'Accept': 'application/json' } }
+        { signal: AbortSignal.timeout(2000), headers: { 'Accept': 'application/json' } }
       );
       if (!r.ok) return null;
       const j = await r.json();
@@ -1824,7 +1830,7 @@ async function fetchOil() {
     try {
       const r = await fetch(
         `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`,
-        { signal: AbortSignal.timeout(5000), headers: { 'Accept': 'application/json' } }
+        { signal: AbortSignal.timeout(2000), headers: { 'Accept': 'application/json' } }
       );
       if (!r.ok) return null;
       const j = await r.json();
@@ -1935,7 +1941,7 @@ async function fetchIndices() {
   async function yahooDirectBulk(endpoint) {
     try {
       const r = await fetch(endpoint, {
-        signal: AbortSignal.timeout(6000),
+        signal: AbortSignal.timeout(2000),
         headers: { 'Accept': 'application/json' }
       });
       if (!r.ok) return null;
@@ -2171,7 +2177,10 @@ function goldChartOptions() {
     {label:t('chartGrayMkt')||'Gray Market'},
     {label:t('chartDefi')||'Blockchain DeFi'},
     {label:t('chartGoldBeesEtf')||'GoldBEES ETF'},
-    {label:t('chartChinaSge')||'China SGE'}
+    {label:t('chartChinaSge')||'China SGE'},
+    {label:t('chartXauOtc')||'XAU/USD Spot'},
+    {label:t('chartComexGc')||'COMEX GC'},
+    {label:t('chartDgcx')||'Dubai DGCX'}
   ];
 }
 
@@ -2201,6 +2210,18 @@ function renderGold() {
   const chinaGoldPG   = fromINR(chinaGoldINRg);
   const chinaGoldUSDg = chinaGoldINRg / LIVE.fx.USD;
 
+  const xauOtcUSDoz = jitter(LIVE.xauOtcUSD || 4490, 0.002);
+  const xauOtcUSDg  = xauOtcUSDoz / TROY_OZ_TO_GRAM;
+  const xauOtcPG    = fromUSD(xauOtcUSDg);
+  
+  const comexGCUSDoz = jitter(LIVE.comexGCUSD || 4510, 0.002);
+  const comexGCUSDg  = comexGCUSDoz / TROY_OZ_TO_GRAM;
+  const comexGCPG    = fromUSD(comexGCUSDg);
+
+  const dgcxUSDoz = jitter(LIVE.dgcxUSD || 4505, 0.002);
+  const dgcxUSDg  = dgcxUSDoz / TROY_OZ_TO_GRAM;
+  const dgcxPG    = fromUSD(dgcxUSDg);
+
   // Real % change for gold: use fetched prev close, fallback to randChg
   const goldChgPct = chgPct(LIVE.goldUSDoz, LIVE.prev.goldUSDoz, 0.7);
   // Per-card % changes: derived prices track spot but have their own micro-spreads
@@ -2213,10 +2234,13 @@ function renderGold() {
   const goldChgDefi  = goldChgPct + randChg(0.08);  // PAXG oracle: very tight to spot
   const goldChgBees  = goldChgPct + randChg(0.15);  // ETF NAV tracking error
   const goldChgChina = goldChgPct + randChg(0.18);  // SGE premium/discount cycle
+  const goldChgXau   = goldChgPct + randChg(0.10);
+  const goldChgComex = goldChgPct + randChg(0.12);
+  const goldChgDgcx  = goldChgPct + randChg(0.11);
 
   const opts = goldChartOptions();
-  const pricesForChart = [spotPG, mcxPG, grayPG, defiPG, beesPG, chinaGoldPG];
-  const colorsForChart = ['#D4AF37','#FF9933','#8890A4','#F7931A','#9370DB','#de2910'];
+  const pricesForChart = [spotPG, mcxPG, grayPG, defiPG, beesPG, chinaGoldPG, xauOtcPG, comexGCPG, dgcxPG];
+  const colorsForChart = ['#D4AF37','#FF9933','#8890A4','#F7931A','#9370DB','#de2910','#27AE60','#2980B9','#E67E22'];
   const selectedIdx = chartState.gold.idx;
 
   // Cards — LIVE/CLOSED is purely time-based, independent of API fetch status
@@ -2229,6 +2253,9 @@ function renderGold() {
     {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('goldCardDefi')||'Tokenized Gold/g PAXG',price:defiPG,basisLine:`${fmtUSD(defiUSDg,2)}/g`,acc:'#F7931A',sub:t('goldCardOracle')||'PAXG · XAUT oracle', tag:liveTag(true), chg:goldChgDefi, icon:'<img src="https://assets.coincap.io/assets/icons/paxg@2x.png" width="16" height="16" onerror="this.style.display=\'none\'" style="vertical-align:middle;margin-left:5px;">'},
     {src:t('cardGoldBees')||'GoldBEES NSE',  lbl:t('goldCardEtf')||'Per gram via ETF',price:beesPG,  basisLine:`₹${beesPerGramINR.toFixed(2)}/g (unit ₹${beesUnitINR.toFixed(2)})`,acc:'#9370DB',sub:'1 unit = 0.01g gold (NSE ETF)', tag:liveTag(nseOpen), chg:goldChgBees, flag:'in'},
     {src:t('cardChinaSge')||'China SGE',      lbl:t('goldCard24k')||'24K Gold / gram',  price:chinaGoldPG, basisLine:`${fmtUSD(chinaGoldUSDg,2)}/g`, acc:'#de2910', sub:t('goldCardChinaSge')||'SGE Shanghai Gold Exchange', tag:metalsTag, chg:goldChgChina, flag:'cn'},
+    {src:t('cardXauOtc')||'XAU/USD Spot',     lbl:t('goldCard24k')||'24K Gold / gram', price:xauOtcPG,  basisLine:`${fmtUSD(xauOtcUSDg,2)}/g (~$4,490/oz)`, acc:'#27AE60', sub:t('goldCardXau')||'OTC / Forex', tag:metalsTag, chg:goldChgXau, flag:'us'},
+    {src:t('cardComexGc')||'COMEX Gold (GC)', lbl:t('goldCard24k')||'24K Gold / gram', price:comexGCPG, basisLine:`${fmtUSD(comexGCUSDg,2)}/g (~$4,510/oz)`, acc:'#2980B9', sub:t('goldCardComex')||'NYSE / COMEX', tag:metalsTag, chg:goldChgComex, flag:'us'},
+    {src:t('cardDgcx')||'Dubai Gold Price',   lbl:t('goldCard24k')||'24K Gold / gram', price:dgcxPG,    basisLine:`${fmtUSD(dgcxUSDg,2)}/g`, acc:'#E67E22', sub:t('goldCardDgcx')||'DGCX Exchange', tag:metalsTag, chg:goldChgDgcx, flag:'ae'},
   ].map(c=>{
     const fHtml = c.flag ? `<img src="https://flagcdn.com/w20/${c.flag}.png" srcset="https://flagcdn.com/w40/${c.flag}.png 2x" width="16" alt="${c.flag}" style="vertical-align:middle;margin-left:5px;border-radius:2px;box-shadow:0 0 2px rgba(0,0,0,0.3)">` : (c.icon ? c.icon : '');
     return `<div class="price-card" style="--accent:${c.acc}">
@@ -2249,6 +2276,9 @@ function renderGold() {
     {src:t('tblDefi')||'Blockchain DeFi (PAXG/XAUT)',  badge:'badge-defi',  type:'Token',   pg:defiPG,  basisVal:defiPG,  ref:false},
     {src:t('tblGoldBees')||'GoldBEES NSE ETF',         badge:'badge-etf',   type:'ETF 0.01g', pg:beesPG,       basisVal:beesPG,       ref:false},
     {src:t('tblChinaSge')||'China SGE (Shanghai)',      badge:'badge-china', type:'SGE Spot', pg:chinaGoldPG,  basisVal:chinaGoldPG,  ref:false},
+    {src:t('tblXauOtc')||'XAU/USD Spot (OTC / Forex)', badge:'badge-world', type:'Spot',    pg:xauOtcPG,    basisVal:xauOtcPG,    ref:false},
+    {src:t('tblComexGc')||'COMEX Gold Futures (GC)',   badge:'badge-premium',type:'Futures',pg:comexGCPG,   basisVal:comexGCPG,   ref:false},
+    {src:t('tblDgcx')||'Dubai Gold (DGCX)',            badge:'badge-world', type:'Futures', pg:dgcxPG,      basisVal:dgcxPG,      ref:false}
   ];
   document.getElementById('goldTable').innerHTML = rows.map((r,i)=>
     `<tr${i===0?' class="best-row"':''}><td class="source-name">${r.src}</td><td><span class="badge ${r.badge}">${r.type}</span></td><td><strong>${fmt(r.pg,2)}</strong></td><td>${r.ref?'<span class="diff-neutral">— Reference</span>':diffStr(r.pg,spotPG)}</td><td>${fmt(r.basisVal,2)}/g&nbsp;(${fxLabel})</td></tr>`
@@ -2279,7 +2309,10 @@ function silverChartOptions() {
     {label:t('chartGrayMkt')||'Gray Market'},
     {label:t('chartDefi')||'Blockchain DeFi'},
     {label:t('chartSilverBeesEtf')||'SilverBEES ETF'},
-    {label:t('chartChinaSge')||'China SGE'}
+    {label:t('chartChinaSge')||'China SGE'},
+    {label:t('chartXagOtc')||'XAG/USD Spot'},
+    {label:t('chartComexSi')||'COMEX Silver'},
+    {label:t('chartTocom')||'TOCOM Silver'}
   ];
 }
 
@@ -2305,6 +2338,18 @@ function renderSilver() {
   const chinaSilverPG   = fromINR(chinaSilverINRg);
   const chinaSilverUSDg = chinaSilverINRg / LIVE.fx.USD;
 
+  const xagOtcUSDoz = jitter(LIVE.xagOtcUSD || 75.68, 0.003);
+  const xagOtcUSDg  = xagOtcUSDoz / TROY_OZ_TO_GRAM;
+  const xagOtcPG    = fromUSD(xagOtcUSDg);
+
+  const comexSIUSDoz = jitter(LIVE.comexSIUSD || 76.00, 0.003);
+  const comexSIUSDg  = comexSIUSDoz / TROY_OZ_TO_GRAM;
+  const comexSIPG    = fromUSD(comexSIUSDg);
+
+  const tocomSilverUSDoz = jitter(LIVE.tocomSilverUSD || 75.80, 0.003);
+  const tocomSilverUSDg  = tocomSilverUSDoz / TROY_OZ_TO_GRAM;
+  const tocomSilverPG    = fromUSD(tocomSilverUSDg);
+
   const silverChgBase = chgPct(LIVE.silverUSDoz, LIVE.prev.silverUSDoz, 1.1);
   // Per-card % changes: silver markets have wider spread variations than gold
   // MCX futures: duty/GST friction adds micro-lag vs LBMA
@@ -2318,10 +2363,13 @@ function renderSilver() {
   const silverChgDefi  = silverChgBase + randChg(0.10);  // oracle: tight to spot
   const silverChgBees  = silverChgBase + randChg(0.22);  // ETF NAV tracking
   const silverChgChina = silverChgBase + randChg(0.25);  // SGE premium cycle
+  const silverChgXag   = silverChgBase + randChg(0.12);
+  const silverChgComex = silverChgBase + randChg(0.14);
+  const silverChgTocom = silverChgBase + randChg(0.13);
 
   const opts = silverChartOptions();
-  const pricesForChart = [spotPG, mcxPG, grayPG, defiPG, beesPG, chinaSilverPG];
-  const colorsForChart = ['#A8A9AD','#FF9933','#8890A4','#F7931A','#9370DB','#de2910'];
+  const pricesForChart = [spotPG, mcxPG, grayPG, defiPG, beesPG, chinaSilverPG, xagOtcPG, comexSIPG, tocomSilverPG];
+  const colorsForChart = ['#A8A9AD','#FF9933','#8890A4','#F7931A','#9370DB','#de2910','#27AE60','#2980B9','#8E44AD'];
   const selectedIdx = chartState.silver.idx;
 
   const apiTag = LIVE.apiStatus.metals==='live' ? '<span style="color:#2ECC71;font-size:9px">● LIVE</span>' : '<span style="color:#8890A4;font-size:9px">● REF</span>';
@@ -2334,6 +2382,9 @@ function renderSilver() {
     {src:t('cardDefi')||'Blockchain DeFi',   lbl:t('silverCardDefi')||'Tokenized Silver/g $PSLV',price:defiPG,basisLine:`${fmtUSD(defiUSDg,4)}/g`,acc:'#F7931A',sub:t('silverCardOracle')||'PSLV · LODE oracle', tag:liveTag(true), chg:silverChgDefi, icon:'<svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:middle;margin-left:5px;" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/><text x="12" y="16" font-family="sans-serif" font-weight="bold" font-size="11" fill="#475569" text-anchor="middle">Ag</text></svg>'},
     {src:t('cardSilverBees')||'SilverBEES NSE',lbl:t('goldCardEtf')||'Per gram via ETF',  price:beesPG, basisLine:`₹${beesINRg.toFixed(2)}/unit=1g`,acc:'#9370DB',sub:t('silverCardUnit')||'1 unit = 1g silver', tag:liveTag(silverNseOpen), chg:silverChgBees, flag:'in'},
     {src:t('cardChinaSge')||'China SGE',       lbl:t('silverCardFine')||'Fine Silver / gram', price:chinaSilverPG, basisLine:`${fmtUSD(chinaSilverUSDg,4)}/g`, acc:'#de2910', sub:t('silverCardChinaSge')||'SGE Shanghai Silver Exchange', tag:silverMetalsTag, chg:silverChgChina, flag:'cn'},
+    {src:t('cardXagOtc')||'XAG/USD Spot',      lbl:t('silverCardFine')||'Fine Silver / gram', price:xagOtcPG,      basisLine:`${fmtUSD(xagOtcUSDg,4)}/g (~$75.68/oz)`, acc:'#27AE60', sub:t('silverCardXag')||'OTC / Forex', tag:silverMetalsTag, chg:silverChgXag, flag:'us'},
+    {src:t('cardComexSi')||'COMEX Silver (SI)',lbl:t('silverCardFine')||'Fine Silver / gram', price:comexSIPG,     basisLine:`${fmtUSD(comexSIUSDg,4)}/g (~$76/oz)`, acc:'#2980B9', sub:t('silverCardComexSi')||'CME Group, New York', tag:silverMetalsTag, chg:silverChgComex, flag:'us'},
+    {src:t('cardTocom')||'TOCOM Silver',       lbl:t('silverCardFine')||'Fine Silver / gram', price:tocomSilverPG, basisLine:`${fmtUSD(tocomSilverUSDg,4)}/g (~$75.80/oz)`, acc:'#8E44AD', sub:t('silverCardTocom')||'Tokyo Commodity Exchange', tag:silverMetalsTag, chg:silverChgTocom, flag:'jp'},
   ].map(c=>{
     const fHtml = c.flag ? `<img src="https://flagcdn.com/w20/${c.flag}.png" srcset="https://flagcdn.com/w40/${c.flag}.png 2x" width="16" alt="${c.flag}" style="vertical-align:middle;margin-left:5px;border-radius:2px;box-shadow:0 0 2px rgba(0,0,0,0.3)">` : (c.icon ? c.icon : '');
     return `<div class="price-card" style="--accent:${c.acc}">
@@ -2354,6 +2405,9 @@ function renderSilver() {
     {src:t('tblDefiSilver')||'Blockchain DeFi (PSLV/LODE)',badge:'badge-defi', type:'Token',  pg:defiPG,  basisVal:defiPG,  ref:false},
     {src:t('tblSilverBees')||'SilverBEES NSE ETF',       badge:'badge-etf',   type:'1u=1g',    pg:beesPG,           basisVal:beesPG,           ref:false},
     {src:t('tblChinaSge')||'China SGE (Shanghai)',        badge:'badge-china', type:'SGE Spot', pg:chinaSilverPG,    basisVal:chinaSilverPG,    ref:false},
+    {src:t('tblXagOtc')||'XAG/USD Spot (OTC / Forex)',    badge:'badge-world', type:'Spot',     pg:xagOtcPG,         basisVal:xagOtcPG,         ref:false},
+    {src:t('tblComexSi')||'COMEX Silver Futures (SI)',    badge:'badge-premium',type:'Futures', pg:comexSIPG,        basisVal:comexSIPG,        ref:false},
+    {src:t('tblTocom')||'TOCOM Silver (Tokyo)',           badge:'badge-world', type:'Futures',  pg:tocomSilverPG,    basisVal:tocomSilverPG,    ref:false}
   ];
   document.getElementById('silverTable').innerHTML = rows.map((r,i)=>
     `<tr${i===0?' class="best-row"':''}><td class="source-name">${r.src}</td><td><span class="badge ${r.badge}">${r.type}</span></td><td><strong>${fmt(r.pg,4)}</strong></td><td>${r.ref?'<span class="diff-neutral">— Reference</span>':diffStr(r.pg,spotPG)}</td><td>${fmt(r.basisVal,4)}/g&nbsp;(${fxLabel})</td></tr>`
@@ -2789,17 +2843,23 @@ function renderTab(tab) {
 // ============================================================
 async function fetchAllData() {
   const btn=document.getElementById('refreshBtn');
-  btn.classList.add('spinning'); btn.disabled=true;
+  if(btn) { btn.classList.add('spinning'); btn.disabled=true; }
 
-  // Fetch all live data
+  // Fetch all live data first
   await fetchAllAPIData();
 
+  // Render and dismiss loader after APIs are done
+  if (!loaderDone) {
+    dismissLoader();
+  }
   renderAll();
-  dismissLoader();   // hide splash screen after first successful render
+  
   const T=TRANSLATIONS[currentLang]||TRANSLATIONS.en;
   const statusParts = Object.entries(LIVE.apiStatus).map(([k,v])=>`${k}:${v==='live'||v==='live-yahoo'||v==='live-frankfurter'?'<span style="color:#2ECC71">✓</span>':'<span style="color:#E74C3C">'+(T.statusFallback||'fallback')+'</span>'}`).join(' · ');
-  document.getElementById('lastUpdate').innerHTML=(T.statusUpdated||T.updated||'Updated')+' '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' · '+statusParts;
-  btn.classList.remove('spinning'); btn.disabled=false;
+  const lu = document.getElementById('lastUpdate');
+  if(lu) { lu.innerHTML=(T.statusUpdated||T.updated||'Updated')+' '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' · '+statusParts; }
+  
+  if(btn) { btn.classList.remove('spinning'); btn.disabled=false; }
   resetCountdown();
 }
 
