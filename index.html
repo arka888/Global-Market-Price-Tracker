@@ -1067,6 +1067,11 @@ const LIVE = {
   aptUSD:       5.50,
   arbUSD:       0.385,
   atomUSD:      4.20,
+  hypeUSD:      25.0,
+  linkUSD:      15.0,
+  bchUSD:       350.0,
+  ankrUSD:      0.035,
+  algoUSD:      0.165,
   // Oil USD/barrel — live May 2026 spot prices (WTI ~$92.99 per TradingView)
   wtiUSD:       92.99,
   brentUSD:     95.50,
@@ -1114,6 +1119,7 @@ const LIVE = {
     btcUSD: 0, ethUSD: 0, solUSD: 0, xrpUSD: 0, dogeUSD: 0, flowUSD: 0,
     maticUSD: 0, bnbUSD: 0, trxUSD: 0, xlmUSD: 0, adaUSD: 0, shibUSD: 0,
     avaxUSD: 0, suiUSD: 0, nearUSD: 0, aptUSD: 0, arbUSD: 0, atomUSD: 0,
+    hypeUSD: 0, linkUSD: 0, bchUSD: 0, ankrUSD: 0, algoUSD: 0,
     sp500: 0, nifty50: 0, nikkei: 0, dax: 0, cac40: 0, ftse100: 0,
     sse: 0, hangseng: 0, csi300: 0, euroStoxx: 0, ta125: 0, moex: 0,
     kospi: 0, sti: 0, taiex: 0
@@ -1577,13 +1583,13 @@ async function fetchCrypto() {
     ['dogecoin','dogeUSD'],['flow','flowUSD'],['matic-network','maticUSD'],['binancecoin','bnbUSD'],
     ['tron','trxUSD'],['stellar','xlmUSD'],['cardano','adaUSD'],['shiba-inu','shibUSD'],
     ['avalanche-2','avaxUSD'],['sui','suiUSD'],['near','nearUSD'],['aptos','aptUSD'],
-    ['arbitrum','arbUSD'],['cosmos','atomUSD']
+    ['arbitrum','arbUSD'],['cosmos','atomUSD'],['hyperliquid','hypeUSD'],['chainlink','linkUSD'],['bitcoin-cash','bchUSD'],['ankr','ankrUSD'],['algorand','algoUSD']
   ];
   const ids = coinMap.map(c=>c[0]).join(',');
-  const ccIds = 'bitcoin,ethereum,solana,ripple,dogecoin,binance-coin,tron,stellar,cardano,shiba-inu,avalanche,near-protocol,aptos,cosmos,arbitrum';
-  const ccMap = {'bitcoin':'btcUSD','ethereum':'ethUSD','solana':'solUSD','ripple':'xrpUSD','dogecoin':'dogeUSD','binance-coin':'bnbUSD','tron':'trxUSD','stellar':'xlmUSD','cardano':'adaUSD','shiba-inu':'shibUSD','avalanche':'avaxUSD','near-protocol':'nearUSD','aptos':'aptUSD','cosmos':'atomUSD','arbitrum':'arbUSD'};
-  const bSyms = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','TRXUSDT','XLMUSDT','AVAXUSDT','NEARUSDT','ATOMUSDT'];
-  const bMap  = {'BTCUSDT':'btcUSD','ETHUSDT':'ethUSD','BNBUSDT':'bnbUSD','SOLUSDT':'solUSD','XRPUSDT':'xrpUSD','DOGEUSDT':'dogeUSD','ADAUSDT':'adaUSD','TRXUSDT':'trxUSD','XLMUSDT':'xlmUSD','AVAXUSDT':'avaxUSD','NEARUSDT':'nearUSD','ATOMUSDT':'atomUSD'};
+  const ccIds = 'bitcoin,ethereum,solana,ripple,dogecoin,binance-coin,tron,stellar,cardano,shiba-inu,avalanche,near-protocol,aptos,cosmos,arbitrum,hyperliquid,chainlink,bitcoin-cash,ankr,algorand';
+  const ccMap = {'bitcoin':'btcUSD','ethereum':'ethUSD','solana':'solUSD','ripple':'xrpUSD','dogecoin':'dogeUSD','binance-coin':'bnbUSD','tron':'trxUSD','stellar':'xlmUSD','cardano':'adaUSD','shiba-inu':'shibUSD','avalanche':'avaxUSD','near-protocol':'nearUSD','aptos':'aptUSD','cosmos':'atomUSD','arbitrum':'arbUSD','hyperliquid':'hypeUSD','chainlink':'linkUSD','bitcoin-cash':'bchUSD','ankr':'ankrUSD','algorand':'algoUSD'};
+  const bSyms = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','TRXUSDT','XLMUSDT','AVAXUSDT','NEARUSDT','ATOMUSDT','HYPEUSDT','LINKUSDT','BCHUSDT','ANKRUSDT','ALGOUSDT'];
+  const bMap  = {'BTCUSDT':'btcUSD','ETHUSDT':'ethUSD','BNBUSDT':'bnbUSD','SOLUSDT':'solUSD','XRPUSDT':'xrpUSD','DOGEUSDT':'dogeUSD','ADAUSDT':'adaUSD','TRXUSDT':'trxUSD','XLMUSDT':'xlmUSD','AVAXUSDT':'avaxUSD','NEARUSDT':'nearUSD','ATOMUSDT':'atomUSD','HYPEUSDT':'hypeUSD','LINKUSDT':'linkUSD','BCHUSDT':'bchUSD','ANKRUSDT':'ankrUSD','ALGOUSDT':'algoUSD'};
 
   // Race CoinGecko, CoinCap, and Binance in parallel — fastest wins
   const [cgRes, ccRes, btRes] = await Promise.allSettled([
@@ -2523,6 +2529,11 @@ const CRYPTO_COINS = [
   {sym:'XLM',  name:'Stellar',       key:'xlmUSD',   color:'#7D00FF', mcapB:10.4,    vol24B:0.22},
   {sym:'FLOW', name:'Flow',          key:'flowUSD',  color:'#00EF8B', mcapB:0.38,    vol24B:0.021},
   {sym:'MATIC',name:'Polygon',       key:'maticUSD', color:'#8247E5', mcapB:1.6,     vol24B:0.14},
+  {sym:'HYPE', name:'Hyperliquid',   key:'hypeUSD',  color:'#60E4C0', mcapB:10.5,    vol24B:2.3},
+  {sym:'LINK', name:'Chainlink',     key:'linkUSD',  color:'#2A5ADA', mcapB:8.5,     vol24B:0.6},
+  {sym:'BCH',  name:'Bitcoin Cash',  key:'bchUSD',   color:'#8DC351', mcapB:6.8,     vol24B:0.35},
+  {sym:'ANKR', name:'Ankr',          key:'ankrUSD',  color:'#2075E8', mcapB:0.35,    vol24B:0.025},
+  {sym:'ALGO', name:'Algorand',      key:'algoUSD',  color:'#8890A4', mcapB:1.35,    vol24B:0.12},
 ];
 
 function renderCrypto() {
@@ -2554,7 +2565,8 @@ function renderCrypto() {
     const mcapUSD = LIVE[c.key+'_mcap'] || (c.mcapB * 1e9);
     const vol24USD = LIVE[c.key+'_vol'] || (c.vol24B * 1e9);
     const logoUrl = c.sym === 'FLOW' ? 'https://cryptologos.cc/logos/flow-flow-logo.svg' : `https://assets.coincap.io/assets/icons/${c.sym.toLowerCase()}@2x.png`;
-    const cLogo = `<img src="${logoUrl}" width="16" height="16" style="vertical-align:text-bottom;margin-right:5px;" onerror="this.style.display=\'none\'">`;
+    const fbSvg = `data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><circle cx=%2212%22 cy=%2212%22 r=%2212%22 fill=%22%23${c.color.replace('#','')}%22/><text x=%2212%22 y=%2217%22 fill=%22white%22 font-size=%2213%22 font-family=%22sans-serif%22 font-weight=%22bold%22 text-anchor=%22middle%22>${c.sym[0]}</text></svg>`;
+    const cLogo = `<img src="${logoUrl}" width="16" height="16" style="vertical-align:text-bottom;margin-right:5px;border-radius:50%;" onerror="this.onerror=null;this.src='${fbSvg}'">`;
     return `<div class="price-card" style="--accent:${c.color}">
       <div class="card-source">${cLogo}${c.sym} ${cryptoLiveTag}</div>
       <div class="card-label">${c.name}</div>
@@ -2578,7 +2590,8 @@ function renderCrypto() {
     const ratioNum = vol24USD && mcapUSD ? (vol24USD/mcapUSD)*100 : 0;
     const ratioClass = ratioNum > 10 ? 'diff-pos' : ratioNum > 2 ? 'diff-neutral' : 'diff-neg';
     const logoUrl = c.sym === 'FLOW' ? 'https://cryptologos.cc/logos/flow-flow-logo.svg' : `https://assets.coincap.io/assets/icons/${c.sym.toLowerCase()}@2x.png`;
-    const cLogo = `<img src="${logoUrl}" width="14" height="14" style="vertical-align:middle;margin-right:6px;" onerror="this.style.display=\'none\'">`;
+    const fbSvg = `data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><circle cx=%2212%22 cy=%2212%22 r=%2212%22 fill=%22%23${c.color.replace('#','')}%22/><text x=%2212%22 y=%2217%22 fill=%22white%22 font-size=%2213%22 font-family=%22sans-serif%22 font-weight=%22bold%22 text-anchor=%22middle%22>${c.sym[0]}</text></svg>`;
+    const cLogo = `<img src="${logoUrl}" width="14" height="14" style="vertical-align:middle;margin-right:6px;border-radius:50%;" onerror="this.onerror=null;this.src='${fbSvg}'">`;
     return `<tr>
       <td class="source-name">${cLogo}<span style="color:${c.color};font-weight:700">${c.sym}</span> ${c.name}</td>
       <td>${fmt(spotConv,dec)}</td>
