@@ -1,0 +1,29 @@
+{
+  "name": "global-market-price-tracker",
+  "version": "1.0.0",
+  "description": "Real-time price tracker for gold, silver, crude oil, global stock indices, and cryptocurrencies",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arka888/Global-Market-Price-Tracker.git"
+  },
+  "keywords": [
+    "gold-price",
+    "silver-price",
+    "crypto-price",
+    "stock-market",
+    "market-tracker"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arka888/Global-Market-Price-Tracker/issues"
+  },
+  "homepage": "https://github.com/arka888/Global-Market-Price-Tracker#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
