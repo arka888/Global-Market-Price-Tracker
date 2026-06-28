@@ -1474,7 +1474,7 @@ function chgPct(current, prev, fallbackMag=0.8) {
 // ============================================================
 async function safeFetch(url, opts={}) {
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(2000), ...opts});
+    const r = await fetch(url, {signal: AbortSignal.timeout(5000), ...opts});
     if (!r.ok) throw new Error('HTTP '+r.status);
     return await r.json();
   } catch(e) { return null; }
@@ -1515,7 +1515,7 @@ async function safeProxiedFetch(url) {
 
   // Try direct first (fast path — works when CORS headers are present)
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(2000)});
+    const r = await fetch(url, {signal: AbortSignal.timeout(3000)});
     if (r.ok) {
       const j = await r.json();
       if (j !== null) { cacheSet(cacheKey, j); return j; }
@@ -1533,7 +1533,7 @@ async function safeProxiedFetch(url) {
   }
   async function tryAlloriginsProxy() {
     try {
-      const r = await fetch(`https://api.allorigins.win/get?url=${enc}`, {signal: AbortSignal.timeout(2000)});
+      const r = await fetch(`https://api.allorigins.win/get?url=${enc}`, {signal: AbortSignal.timeout(5000)});
       if (!r.ok) return null;
       const w = await r.json();
       if (w?.contents) { const p = tryParseJSON(w.contents); return p || null; }
@@ -1541,10 +1541,48 @@ async function safeProxiedFetch(url) {
     return null;
   }
 
+  async function tryAllorigins2Proxy() {
+    try {
+      const r = await fetch(`https://api.allorigins.win/raw?url=${enc}`, {signal: AbortSignal.timeout(5000)});
+      if (!r.ok) return null;
+      const text = await r.text();
+      return tryParseJSON(text);
+    } catch(e) { return null; }
+  }
+
+  async function tryCorsproxyio() {
+    try {
+      const r = await fetch(`https://corsproxy.io/?${enc}`, {signal: AbortSignal.timeout(5000)});
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j || null;
+    } catch(e) { return null; }
+  }
+
+  async function tryCorsAnywhere() {
+    try {
+      const r = await fetch(`https://cors-anywhere.herokuapp.com/${url}`, {signal: AbortSignal.timeout(5000)});
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j || null;
+    } catch(e) { return null; }
+  }
+
+  async function tryCodetabs() {
+    try {
+      const r = await fetch(`https://api.codetabs.com/v1/proxy?quest=${enc}`, {signal: AbortSignal.timeout(5000)});
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j || null;
+    } catch(e) { return null; }
+  }
+
   const proxyRace = [
-    tryProxy(fetch(`https://corsproxy.io/?${enc}`, {signal: AbortSignal.timeout(2000)})),
+    tryCorsproxyio(),
     tryAlloriginsProxy(),
-    tryProxy(fetch(`https://api.codetabs.com/v1/proxy?quest=${enc}`, {signal: AbortSignal.timeout(2000)})),
+    tryAllorigins2Proxy(),
+    tryCodetabs(),
+    tryCorsAnywhere(),
   ];
 
   // Return the first non-null result
@@ -1593,12 +1631,13 @@ async function fetchFX() {
     return;
   }
   // Race all FX sources in parallel for speed
-  const [d1, d2, d3] = await Promise.allSettled([
+  const [d1, d2, d3, d4] = await Promise.allSettled([
     safeFetch('https://open.er-api.com/v6/latest/USD'),
+    safeFetch('https://api.exchangerate-api.com/v4/latest/USD'),
     safeFetch('https://api.frankfurter.app/latest?from=USD'),
     safeFetch('https://api.fxratesapi.com/latest?base=USD')
   ]);
-  const d = [d1, d2, d3].map(r => r.status === 'fulfilled' ? r.value : null).find(r => r?.rates);
+  const d = [d1, d2, d3, d4].map(r => r.status === 'fulfilled' ? r.value : null).find(r => r?.rates);
   if (d) cacheSet('fx_rates', d);
   if (d?.rates) {
     processFXRates(d.rates);
@@ -1628,11 +1667,11 @@ async function fetchCrypto() {
   const bSyms = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','TRXUSDT','XLMUSDT','AVAXUSDT','NEARUSDT','ATOMUSDT','HYPEUSDT','LINKUSDT','BCHUSDT','ANKRUSDT','ALGOUSDT'];
   const bMap  = {'BTCUSDT':'btcUSD','ETHUSDT':'ethUSD','BNBUSDT':'bnbUSD','SOLUSDT':'solUSD','XRPUSDT':'xrpUSD','DOGEUSDT':'dogeUSD','ADAUSDT':'adaUSD','TRXUSDT':'trxUSD','XLMUSDT':'xlmUSD','AVAXUSDT':'avaxUSD','NEARUSDT':'nearUSD','ATOMUSDT':'atomUSD','HYPEUSDT':'hypeUSD','LINKUSDT':'linkUSD','BCHUSDT':'bchUSD','ANKRUSDT':'ankrUSD','ALGOUSDT':'algoUSD'};
 
-  // Race CoinGecko, CoinCap, and Binance in parallel — fastest wins
+  // Race CoinGecko, CoinCap, and Binance (via proxy) in parallel — fastest wins
   const [cgRes, ccRes, btRes] = await Promise.allSettled([
     safeFetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`),
     safeFetch(`https://api.coincap.io/v2/assets?ids=${ccIds}&limit=20`),
-    safeFetch(`https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(bSyms)}`)
+    safeProxiedFetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(bSyms)}`)
   ]);
   const d = cgRes.status === 'fulfilled' ? cgRes.value : null;
   const cc = ccRes.status === 'fulfilled' ? ccRes.value : null;
@@ -1668,9 +1707,20 @@ async function fetchCrypto() {
     cacheSet('crypto_prices', snapshot);
     return;
   }
-  // Use Binance as last resort
+  // Use Binance (via proxy) as last resort
   if (Array.isArray(bt) && bt.length) {
-    bt.forEach(t => { const key = bMap[t.symbol]; if (key && t.price) { LIVE[key] = parseFloat(t.price); snapshot[key] = LIVE[key]; } });
+    bt.forEach(t => {
+      const key = bMap[t.symbol];
+      if (key && t.lastPrice) {
+        LIVE[key] = parseFloat(t.lastPrice);
+        snapshot[key] = LIVE[key];
+      }
+      if (key && t.volume) { LIVE[key+'_vol'] = parseFloat(t.volume) * parseFloat(t.lastPrice||0); snapshot[key+'_vol'] = LIVE[key+'_vol']; }
+      if (key && t.priceChangePercent && t.lastPrice) {
+        const chgPc = parseFloat(t.priceChangePercent);
+        if (!isNaN(chgPc)) LIVE.prev[key] = parseFloat(t.lastPrice) / (1 + chgPc / 100);
+      }
+    });
     LIVE.apiStatus.crypto = 'live';
     cacheSet('crypto_prices', snapshot);
     return;
@@ -1689,19 +1739,20 @@ async function fetchGoldSilver() {
     LIVE.apiStatus.metals = 'live';
   }
 
-  // Source 2 (fallback if source 1 failed): metals.live
+  // Source 2 (fallback): Yahoo Finance v8 chart GC=F + SI=F (via proxy)
   if (LIVE.apiStatus.metals !== 'live') {
-    const d2 = await safeProxiedFetch('https://metals.live/api/spot');
-    if (Array.isArray(d2) && d2.length) {
-      const gold   = d2.find(m => ['xau','gold'].includes((m.metal||'').toLowerCase()));
-      const silver = d2.find(m => ['xag','silver'].includes((m.metal||'').toLowerCase()));
-      if (gold?.price   > 0) LIVE.goldUSDoz   = gold.price;
-      if (silver?.price > 0) LIVE.silverUSDoz = silver.price;
-      LIVE.apiStatus.metals = 'live';
-    }
+    const [gV8, sV8] = await Promise.all([
+      safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d'),
+      safeProxiedFetch('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d')
+    ]);
+    const gPrice = gV8?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    const sPrice = sV8?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    if (gPrice > 0) LIVE.goldUSDoz = gPrice;
+    if (sPrice > 0) LIVE.silverUSDoz = sPrice;
+    if (gPrice > 0) LIVE.apiStatus.metals = 'live';
   }
 
-  // Source 3 (fallback): Yahoo Finance GC=F + SI=F futures via v7 quote (via proxy)
+  // Source 3 (fallback): Yahoo Finance v7 quote GC=F + SI=F (via proxy)
   if (LIVE.apiStatus.metals !== 'live') {
     const d3 = await safeProxiedFetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols=GC=F,SI=F&fields=regularMarketPrice,symbol');
     (d3?.quoteResponse?.result || []).forEach(q => {
@@ -1795,17 +1846,10 @@ function applyOilSpreads(wti, brent) {
 async function fetchOil() {
   function oilOk(v) { return typeof v === 'number' && v > 30 && v < 200; }
 
-  // ── Attempt A: Yahoo Finance DIRECT (no proxy) ──────────────────────────
-  // Yahoo Finance v8 chart API often allows CORS from browsers.
-  // This is the fastest path — no proxy round-trip needed.
-  async function tryYahooDirectV8(symbol) {
+  // ── Attempt A: Yahoo Finance via PROXY (CORS-safe) ──────────────────────────
+  async function tryYahooProxyV8(symbol) {
     try {
-      const r = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
-        { signal: AbortSignal.timeout(2000), headers: { 'Accept': 'application/json' } }
-      );
-      if (!r.ok) return null;
-      const j = await r.json();
+      const j = await safeProxiedFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`);
       const meta = j?.chart?.result?.[0]?.meta;
       return {
         price: meta?.regularMarketPrice,
@@ -1814,26 +1858,16 @@ async function fetchOil() {
     } catch(e) { return null; }
   }
 
-  async function tryYahooDirectV7(symbols) {
+  async function tryYahooProxyV7(symbols) {
     try {
-      const r = await fetch(
-        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`,
-        { signal: AbortSignal.timeout(2000), headers: { 'Accept': 'application/json' } }
-      );
-      if (!r.ok) return null;
-      const j = await r.json();
+      const j = await safeProxiedFetch(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`);
       return j?.quoteResponse?.result || null;
     } catch(e) { return null; }
   }
 
-  async function tryYahooDirectV6(symbol) {
+  async function tryYahooProxyV6(symbol) {
     try {
-      const r = await fetch(
-        `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`,
-        { signal: AbortSignal.timeout(2000), headers: { 'Accept': 'application/json' } }
-      );
-      if (!r.ok) return null;
-      const j = await r.json();
+      const j = await safeProxiedFetch(`https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`);
       const meta = j?.chart?.result?.[0]?.meta;
       return {
         price: meta?.regularMarketPrice,
@@ -1871,29 +1905,29 @@ async function fetchOil() {
 
   // ── Race ALL sources in parallel — first valid result wins ─────────────
   const raceResults = await Promise.allSettled([
-    // Direct Yahoo Finance v8 — CL=F (fastest, no proxy)
+    // Yahoo Finance v8 via proxy — CL=F
     (async () => {
       const [clRes, bzRes] = await Promise.all([
-        tryYahooDirectV8('CL=F'),
-        tryYahooDirectV8('BZ=F')
+        tryYahooProxyV8('CL=F'),
+        tryYahooProxyV8('BZ=F')
       ]);
       if (!clRes || !oilOk(clRes.price)) return null;
       const brent = bzRes && oilOk(bzRes.price) ? bzRes.price : clRes.price + 2.5;
       return { wti: clRes.price, brent, wPrev: clRes.prev, bPrev: bzRes?.prev };
     })(),
-    // Direct Yahoo Finance v6 (query2) — fallback direct
+    // Yahoo Finance v6 (query2) via proxy — fallback
     (async () => {
       const [clRes, bzRes] = await Promise.all([
-        tryYahooDirectV6('CL=F'),
-        tryYahooDirectV6('BZ=F')
+        tryYahooProxyV6('CL=F'),
+        tryYahooProxyV6('BZ=F')
       ]);
       if (!clRes || !oilOk(clRes.price)) return null;
       const brent = bzRes && oilOk(bzRes.price) ? bzRes.price : clRes.price + 2.5;
       return { wti: clRes.price, brent, wPrev: clRes.prev, bPrev: bzRes?.prev };
     })(),
-    // Direct Yahoo v7 bulk quote
+    // Yahoo v7 bulk quote via proxy
     (async () => {
-      const res = await tryYahooDirectV7('CL%3DF%2CBZ%3DF');
+      const res = await tryYahooProxyV7('CL%3DF%2CBZ%3DF');
       if (!Array.isArray(res)) return null;
       let wti = 0, brent = 0, wPrev = 0, bPrev = 0;
       res.forEach(q => {
@@ -1937,15 +1971,11 @@ async function fetchIndices() {
   const symbolStr = symbols.join(',');
   let filled = 0;
 
-  // ── Direct Yahoo Finance (no proxy) — fastest path ──────────────────────────────
-  async function yahooDirectBulk(endpoint) {
+  // ── Proxy-based Yahoo Finance (CORS-safe) ──────────────────────────────
+  async function yahooProxyBulk(endpoint) {
     try {
-      const r = await fetch(endpoint, {
-        signal: AbortSignal.timeout(2000),
-        headers: { 'Accept': 'application/json' }
-      });
-      if (!r.ok) return null;
-      return await r.json();
+      const j = await safeProxiedFetch(endpoint);
+      return j || null;
     } catch(e) { return null; }
   }
 
@@ -1962,22 +1992,19 @@ async function fetchIndices() {
     return n;
   }
 
-  // Race direct Yahoo v7 (query1 + query2) with proxy in parallel
+  // Race proxy-based Yahoo v7 (query1 + query2) in parallel
   const enc = encodeURIComponent(symbolStr);
-  const [directQ1, directQ2, proxied] = await Promise.allSettled([
-    yahooDirectBulk(
+  const [proxyQ1, proxyQ2] = await Promise.allSettled([
+    yahooProxyBulk(
       `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${enc}&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketOpen,symbol`
     ),
-    yahooDirectBulk(
+    yahooProxyBulk(
       `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${enc}&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketOpen,symbol`
-    ),
-    safeProxiedFetch(
-      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolStr}&fields=regularMarketPrice,regularMarketPreviousClose,symbol`
     )
   ]);
 
   // Use first source that returned usable results
-  for (const res of [directQ1, directQ2, proxied]) {
+  for (const res of [proxyQ1, proxyQ2]) {
     if (res.status !== 'fulfilled' || !res.value) continue;
     const results = res.value?.quoteResponse?.result || [];
     if (results.length > 0) {
@@ -1986,14 +2013,14 @@ async function fetchIndices() {
     }
   }
 
-  // Fill any still-missing indices via direct Yahoo v8 chart (per-symbol, parallel)
+  // Fill any still-missing indices via proxy Yahoo v8 chart (per-symbol, parallel)
   if (filled < 8) {
     const missing = Object.entries(symMap).filter(([sym, key]) => !(LIVE[key] > 0));
     await Promise.allSettled(missing.map(async ([sym, key]) => {
-      // Try query1 and query2 in parallel per symbol
+      // Try query1 and query2 via proxy in parallel per symbol
       const [r1, r2] = await Promise.allSettled([
-        yahooDirectBulk(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`),
-        yahooDirectBulk(`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`),
+        yahooProxyBulk(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`),
+        yahooProxyBulk(`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`),
       ]);
       for (const r of [r1, r2]) {
         if (r.status !== 'fulfilled' || !r.value) continue;
@@ -2285,7 +2312,7 @@ function renderGold() {
   ).join('');
 
   const noteSrc = t('noteDataSrc')||'Data source:';
-  const noteFb = LIVE.apiStatus.metals==='live'?'metals.live live feed':(t('noteFallback')||'Fallback reference prices');
+  const noteFb = LIVE.apiStatus.metals==='live'?'goldprice.org live feed':(t('noteFallback')||'Fallback reference prices');
   const noteFx = LIVE.apiStatus.fx==='live'?(t('noteFxLive')||'Exchange rates: open.er-api.com'):'FX: reference rates';
   const lbmaLabel = t('noteLbmaSpot')||'LBMA Spot';
   const mcxLabel = t('noteMcx')||'MCX';
@@ -2414,7 +2441,7 @@ function renderSilver() {
   ).join('');
 
   const noteSrc = t('noteDataSrc')||'Data source:';
-  const noteFb = LIVE.apiStatus.metals==='live'?'metals.live live feed':(t('noteFallback')||'Fallback reference prices');
+  const noteFb = LIVE.apiStatus.metals==='live'?'goldprice.org live feed':(t('noteFallback')||'Fallback reference prices');
   const lbmaLabel = t('noteLbmaSpot')||'LBMA Spot';
   const mcxLabel = t('noteMcx')||'MCX';
   const grayLabel = t('noteGray')||'Gray';
